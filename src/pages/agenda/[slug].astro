@@ -1,0 +1,64 @@
+---
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles', ({ data }) => !data.needs_human_review);
+  return articles.map(article => ({
+    params: { slug: article.data.slug },
+    props: { article }
+  }));
+}
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+const d = article.data;
+
+const eventSchema = {
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": d.title,
+    "description": d.meta_description,
+  "startDate": d.heure_debut ? `${d.date_debut}T${d.heure_debut}:00` : d.date_debut,
+  "endDate": d.heure_fin ? `${d.date_fin}T${d.heure_fin}:00` : d.date_fin,
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "location": {
+    "@type": "Place",
+    "name": d.lieu,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": d.ville,
+      "postalCode": d.code_postal,
+      "addressCountry": "FR"
+    }
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": Astro.url.href,
+    "price": d.prix && d.prix.toLowerCase().includes('gratuit') ? "0" : "0",
+    "priceCurrency": "EUR",
+    "availability": "https://schema.org/InStock"
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": "Agenda Rennes"
+  }
+}
+
+
+---
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>{d.meta_title}</title>
+  <meta name="description" content={d.meta_description} />
+  <script type="application/ld+json" set:html={JSON.stringify(eventSchema)} />
+</head>
+<body>
+  <article>
+    <h1>{d.title}</h1>
+    <Content />
+    <p><small>Source : <a href={d.source_url} rel="nofollow">{d.source_url}</a></small></p>
+  </article>
+</body>
+</html>

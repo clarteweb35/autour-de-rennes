@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content';
+
+// On récupère uniquement les articles validés (pas ceux en attente de relecture)
+const articles = await getCollection('articles', ({ data }) => !data.needs_human_review);
+
+// Tri par date de l'événement, du plus proche au plus lointain
+const articlesTries = articles.sort((a, b) => 
+  new Date(a.data.date_debut).getTime() - new Date(b.data.date_debut).getTime()
+);
+
+// Formatage lisible d'une date ISO en français
+function formaterDate(dateStr: string) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+---
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Que faire à Rennes ce week-end ? Agenda local</title>
+  <meta name="description" content="Braderies, brocantes, événements culturels : découvrez l'agenda complet des sorties à Rennes et alentours." />
+</head>
+<body>
+  <h1>Que faire à Rennes et alentours ?</h1>
+
+  <div class="liste-articles">
+    {articlesTries.map(article => {
+      const d = article.data;
+      return (
+        <article class="carte-evenement">
+          <a href={`/agenda/${d.slug}`}>
+            <h2>{d.title}</h2>
+          </a>
+          <p class="date">{formaterDate(d.date_debut)}</p>
+          <p class="lieu">📍 {d.lieu}, {d.ville}</p>
+          {d.categorie && <span class="categorie">{d.categorie}</span>}
+          {d.prix && <span class="prix">💶 {d.prix}</span>}
+        </article>
+      );
+    })}
+  </div>
+
+  {articlesTries.length === 0 && <p>Aucun événement à venir pour le moment.</p>}
+</body>
+</html>
