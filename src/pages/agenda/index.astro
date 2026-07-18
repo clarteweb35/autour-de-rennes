@@ -1,46 +1,80 @@
 ---
 import { getCollection } from 'astro:content';
 
-// On récupère uniquement les articles validés (pas ceux en attente de relecture)
 const articles = await getCollection('articles', ({ data }) => !data.needs_human_review);
 
-// Tri par date de l'événement, du plus proche au plus lointain
-const articlesTries = articles.sort((a, b) => 
+// On ne garde que les evenements dont la date de fin n'est pas deja passee
+const aujourdhui = new Date();
+aujourdhui.setHours(0, 0, 0, 0);
+
+const articlesAVenir = articles.filter(article => {
+  const dateFin = new Date(article.data.date_fin);
+  return dateFin >= aujourdhui;
+});
+
+const articlesTries = articlesAVenir.sort((a, b) =>
   new Date(a.data.date_debut).getTime() - new Date(b.data.date_debut).getTime()
 );
 
-// Formatage lisible d'une date ISO en français
-function formaterDate(dateStr: string) {
+function formaterJourMois(dateStr: string) {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return {
+    jour: date.toLocaleDateString('fr-FR', { day: 'numeric' }),
+    mois: date.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '')
+  };
 }
 ---
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Que faire à Rennes ce week-end ? Agenda local</title>
   <meta name="description" content="Braderies, brocantes, événements culturels : découvrez l'agenda complet des sorties à Rennes et alentours." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
 </head>
 <body>
-  <h1>Que faire à Rennes et alentours ?</h1>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
+      <span class="sous-titre-site">L'agenda des sorties locales</span>
+    </div>
+  </header>
 
-  <div class="liste-articles">
-    {articlesTries.map(article => {
-      const d = article.data;
-      return (
-        <article class="carte-evenement">
-          <a href={`/agenda/${d.slug}`}>
-            <h2>{d.title}</h2>
-          </a>
-          <p class="date">{formaterDate(d.date_debut)}</p>
-          <p class="lieu">📍 {d.lieu}, {d.ville}</p>
-          {d.categorie && <span class="categorie">{d.categorie}</span>}
-          {d.prix && <span class="prix">💶 {d.prix}</span>}
-        </article>
-      );
-    })}
-  </div>
+  <main class="conteneur">
+    <h1 class="titre-page">Que faire à Rennes<br />et alentours ?</h1>
+    <p class="chapo-page">Braderies, brocantes, marchés et rendez-vous culturels du bassin rennais, mis à jour chaque jour.</p>
 
-  {articlesTries.length === 0 && <p>Aucun événement à venir pour le moment.</p>}
+    <div class="grille-evenements">
+      {articlesTries.map(article => {
+        const d = article.data;
+        const { jour, mois } = formaterJourMois(d.date_debut);
+        return (
+          <article class="carte-evenement">
+            <div class="billet-date">
+              <span class="billet-jour">{jour}</span>
+              <span class="billet-mois">{mois}</span>
+            </div>
+            <h2 class="carte-titre">
+              <a href={`/autour-de-rennes/agenda/${d.slug}`}>{d.title}</a>
+            </h2>
+            <p class="carte-meta">📍 {d.lieu}, {d.ville}</p>
+            <div class="carte-tags">
+              {d.categorie && <span class="etiquette">{d.categorie}</span>}
+              {d.prix && <span class="etiquette prix">{d.prix}</span>}
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    {articlesTries.length === 0 && <p>Aucun événement à venir pour le moment.</p>}
+  </main>
+
+  <footer class="pied-site">
+    <p>Autour de Rennes — agenda mis à jour automatiquement à partir de sources officielles.</p>
+  </footer>
 </body>
 </html>

@@ -17,7 +17,7 @@ const eventSchema = {
   "@context": "https://schema.org",
   "@type": "Event",
   "name": d.title,
-    "description": d.meta_description,
+  "description": d.meta_description,
   "startDate": d.heure_debut ? `${d.date_debut}T${d.heure_debut}:00` : d.date_debut,
   "endDate": d.heure_fin ? `${d.date_fin}T${d.heure_fin}:00` : d.date_fin,
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
@@ -35,30 +35,49 @@ const eventSchema = {
   "offers": {
     "@type": "Offer",
     "url": Astro.url.href,
-    "price": d.prix && d.prix.toLowerCase().includes('gratuit') ? "0" : "0",
+    "price": "0",
     "priceCurrency": "EUR",
     "availability": "https://schema.org/InStock"
   },
   "organizer": {
     "@type": "Organization",
-    "name": "Agenda Rennes"
+    "name": "Autour de Rennes"
   }
-}
-
-
+};
 ---
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{d.meta_title}</title>
   <meta name="description" content={d.meta_description} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
   <script type="application/ld+json" set:html={JSON.stringify(eventSchema)} />
 </head>
 <body>
-  <article>
-    <h1>{d.title}</h1>
-    <Content />
-    <p><small>Source : <a href={d.source_url} rel="nofollow">{d.source_url}</a></small></p>
-  </article>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
+      <span class="sous-titre-site">L'agenda des sorties locales</span>
+    </div>
+  </header>
+
+  <main class="conteneur">
+    <a href="/autour-de-rennes/agenda/" class="fil-retour">← Tous les événements</a>
+    <h1 class="article-titre">{d.title}</h1>
+
+    <div class="article-corps">
+      <Content />
+    </div>
+
+    <p class="article-source">Source : <a href={d.source_url} rel="nofollow">{d.source_url}</a></p>
+  </main>
+
+  <footer class="pied-site">
+    <p>Autour de Rennes — agenda mis à jour automatiquement à partir de sources officielles.</p>
+  </footer>
 </body>
 </html>
