@@ -2,8 +2,10 @@ name: Collecte quotidienne des articles
 
 on:
   schedule:
+    # 6h00 UTC = 8h00 heure de Paris (heure d'ete) ou 7h00 (heure d'hiver)
     - cron: '0 6 * * *'
   workflow_dispatch:
+    # Permet aussi de declencher le script manuellement depuis l'onglet "Actions" de GitHub
 
 permissions:
   contents: write
@@ -19,7 +21,7 @@ jobs:
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Installer les dependances
         run: npm install
