@@ -1,0 +1,39 @@
+name: Collecte quotidienne des articles
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  collecte:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le code du repo
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Installer les dependances
+        run: npm install
+
+      - name: Lancer le script de collecte
+        env:
+          DATATOURISME_API_KEY: ${{ secrets.DATATOURISME_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/collecte-articles.js
+
+      - name: Committer les nouveaux articles (si il y en a)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/articles/
+          git diff --staged --quiet && echo "Aucun nouvel article, rien a committer" || git commit -m "Ajout automatique d'articles - $(date +'%Y-%m-%d')"
+          git push
