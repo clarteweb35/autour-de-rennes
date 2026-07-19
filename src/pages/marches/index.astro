@@ -1,1 +1,83 @@
+---
+import { marches } from '../../data/marches.js';
 
+const ordreJours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+const marchesFixes = marches.filter(m => m.jour !== 'tous les jours');
+const marchesTousLesJours = marches.filter(m => m.jour === 'tous les jours');
+---
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Marchés de la semaine | Autour de Rennes</title>
+  <meta name="description" content="Retrouvez tous les marchés hebdomadaires autour de Domagné, Rennes, Vitré et le bassin rennais." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
+      <nav class="nav-entete">
+        <a href="/autour-de-rennes/annuaire/">Annuaire</a>
+        <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
+        <span class="sous-titre-site">L'agenda des sorties locales</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="conteneur">
+    <a href="/autour-de-rennes/agenda/" class="fil-retour">← Retour à l'agenda</a>
+    <h1 class="titre-page">Marchés de la semaine</h1>
+    <p class="chapo-page">Tous les marchés hebdomadaires du secteur, jour par jour.</p>
+
+    {marchesTousLesJours.length > 0 && (
+      <section class="section-annuaire">
+        <h2 class="sous-titre-section">Tous les jours</h2>
+        <div class="liste-commerces">
+          {marchesTousLesJours.map(m => (
+            <div class="ligne-commerce">
+              <div class="ligne-commerce-principal">
+                <span class="ligne-commerce-nom">{m.commune}</span>
+                <span class="ligne-commerce-commune">{m.horaire}</span>
+              </div>
+              <div class="ligne-commerce-secondaire">
+                <span class="ligne-commerce-tel">📍 {m.lieu}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {ordreJours.map(jour => {
+      const marchesDuJour = marchesFixes.filter(m => m.jour === jour);
+      if (marchesDuJour.length === 0) return null;
+      return (
+        <section class="section-annuaire">
+          <h2 class="sous-titre-section">{jour.charAt(0).toUpperCase() + jour.slice(1)}</h2>
+          <div class="liste-commerces">
+            {marchesDuJour.map(m => (
+              <div class="ligne-commerce">
+                <div class="ligne-commerce-principal">
+                  <span class="ligne-commerce-nom">{m.commune}</span>
+                  <span class="ligne-commerce-commune">{m.horaire}</span>
+                </div>
+                <div class="ligne-commerce-secondaire">
+                  <span class="ligne-commerce-tel">📍 {m.lieu}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    })}
+  </main>
+
+  <footer class="pied-site">
+    <p>Autour de Rennes — planning des marchés mis à jour manuellement.</p>
+  </footer>
+</body>
+</html>
