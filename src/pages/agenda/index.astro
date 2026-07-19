@@ -41,7 +41,6 @@ const marchesAujourdhui = marches.filter(m => m.jour === jourSemaineTexte || m.j
 const foodTrucksAujourdhui = foodTrucks.filter(f => f.jour === jourSemaineTexte);
 const foodTrucksVariables = foodTrucks.filter(f => f.jour === 'variable');
 
-// Si rien aujourd'hui, on cherche le(s) prochain(s) food truck(s) a venir
 let prochainsFoodTrucks = [];
 let prochainJourLabel = '';
 if (foodTrucksAujourdhui.length === 0) {
@@ -138,6 +137,7 @@ if (foodTrucksAujourdhui.length === 0) {
         {foodTrucksVariables.length > 0 && (
           <p class="bandeau-marches-note">+ {foodTrucksVariables.map(f => f.commune).join(', ')} (jours variables)</p>
         )}
+        <a href="/autour-de-rennes/foodtrucks/" class="lien-plus">Tous les food trucks →</a>
       </div>
 
       <div class="bandeau-bloc" id="bloc-air">
@@ -238,7 +238,6 @@ if (foodTrucksAujourdhui.length === 0) {
     }
     chargerMeteo();
 
-    // Prix des carburants a proximite (API officielle data.economie.gouv.fr)
     async function chargerCarburants() {
       const bloc = document.getElementById('bloc-carburants');
       if (!bloc) return;
@@ -275,7 +274,6 @@ if (foodTrucksAujourdhui.length === 0) {
     }
     chargerCarburants();
 
-    // Qualite de l'air et pollens (API Open-Meteo, gratuite, sans cle)
     function categorieAQI(valeur) {
       if (valeur <= 20) return { label: 'Bon', classe: 'aqi-bon' };
       if (valeur <= 40) return { label: 'Moyen', classe: 'aqi-moyen' };
@@ -295,7 +293,6 @@ if (foodTrucksAujourdhui.length === 0) {
         const aqi = Math.round(data.current.european_aqi);
         const cat = categorieAQI(aqi);
 
-        // On prend l'heure actuelle pour les pollens (index correspondant dans le tableau horaire)
         const heureActuelle = new Date().getHours();
         const pollens = [
           { nom: 'Bouleau', valeur: data.hourly.birch_pollen[heureActuelle] },
@@ -304,7 +301,7 @@ if (foodTrucksAujourdhui.length === 0) {
           { nom: 'Ambroisie', valeur: data.hourly.ragweed_pollen[heureActuelle] },
           { nom: 'Armoise', valeur: data.hourly.mugwort_pollen[heureActuelle] },
           { nom: 'Olivier', valeur: data.hourly.olive_pollen[heureActuelle] }
-        ].filter(p => p.valeur !== null && p.valeur > 5); // on n'affiche que les pollens significatifs
+        ].filter(p => p.valeur !== null && p.valeur > 5);
 
         const pollensTexte = pollens.length > 0
           ? pollens.map(p => p.nom).join(', ')
