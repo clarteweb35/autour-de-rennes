@@ -92,67 +92,58 @@ if (foodTrucksAujourdhui.length === 0) {
 
   <main class="conteneur">
 
-    <section class="bandeau-jour">
-      <div class="bandeau-bloc">
-        <p class="bandeau-jour-texte">{jourSemaineTexte} {dateLongue}</p>
-        <p class="bandeau-heure" id="horloge">--:--</p>
-        {saintDuJour && <p class="bandeau-saint">Bonne fête aux {saintDuJour} !</p>}
+    <!-- Bandeau fin : date/heure/fete + qualite de l'air -->
+    <section class="bandeau-court">
+      <div class="bandeau-court-date">
+        <span class="bandeau-court-jour">{jourSemaineTexte} {dateLongue}</span>
+        <span class="bandeau-court-heure" id="horloge">--:--</span>
+        {saintDuJour && <span class="bandeau-court-saint">Bonne fête aux {saintDuJour} !</span>}
+      </div>
+      <div class="bandeau-court-air" id="bandeau-air-court">Qualité de l'air : chargement…</div>
+    </section>
+
+    <!-- Grille de 4 cartes resumees -->
+    <div class="grille-infos">
+      <div class="carte-info" id="bloc-meteo">
+        <p class="carte-info-titre">Météo à Chaumeré</p>
+        <p class="carte-info-contenu">Chargement…</p>
       </div>
 
-      <div class="bandeau-bloc" id="bloc-meteo">
-        <p class="bandeau-meteo-titre">Météo à Chaumeré</p>
-        <p class="bandeau-meteo-contenu">Chargement…</p>
-      </div>
-
-      <div class="bandeau-bloc">
-        <p class="bandeau-marches-titre">Marché{marchesAujourdhui.length > 1 ? 's' : ''} aujourd'hui</p>
+      <div class="carte-info">
+        <p class="carte-info-titre">Marché{marchesAujourdhui.length > 1 ? 's' : ''} aujourd'hui</p>
         {marchesAujourdhui.length > 0 ? (
-          <ul class="liste-marches">
-            {marchesAujourdhui.map(m => (
-              <li>{m.commune} <span class="marche-horaire">— {m.horaire}</span></li>
+          <ul class="liste-courte">
+            {marchesAujourdhui.slice(0, 2).map(m => (
+              <li>{m.commune} <span class="liste-courte-detail">— {m.horaire}</span></li>
             ))}
           </ul>
         ) : (
-          <p class="bandeau-marches-vide">Aucun marché recensé aujourd'hui.</p>
+          <p class="carte-info-contenu">Aucun marché aujourd'hui.</p>
         )}
+        <a href="/autour-de-rennes/marches/" class="lien-plus">Tous les marchés →</a>
       </div>
-      <div class="bandeau-bloc">
-        <p class="bandeau-marches-titre">Food trucks aujourd'hui</p>
+
+      <div class="carte-info">
+        <p class="carte-info-titre">Food trucks aujourd'hui</p>
         {foodTrucksAujourdhui.length > 0 ? (
-          <ul class="liste-marches">
-            {foodTrucksAujourdhui.map(f => (
-              <li>{f.nom} <span class="marche-horaire">— {f.specialite} ({f.commune})</span></li>
+          <ul class="liste-courte">
+            {foodTrucksAujourdhui.slice(0, 2).map(f => (
+              <li>{f.nom} <span class="liste-courte-detail">— {f.specialite}</span></li>
             ))}
           </ul>
         ) : prochainsFoodTrucks.length > 0 ? (
-          <>
-            <p class="bandeau-marches-vide">Rien aujourd'hui.</p>
-            <p class="bandeau-marches-prochain">Prochain : <strong>{prochainJourLabel}</strong></p>
-            <ul class="liste-marches">
-              {prochainsFoodTrucks.map(f => (
-                <li>{f.nom} <span class="marche-horaire">— {f.specialite} ({f.commune})</span></li>
-              ))}
-            </ul>
-          </>
+          <p class="carte-info-contenu">Rien aujourd'hui. Prochain : <strong>{prochainJourLabel}</strong></p>
         ) : (
-          <p class="bandeau-marches-vide">Aucun food truck recensé.</p>
-        )}
-        {foodTrucksVariables.length > 0 && (
-          <p class="bandeau-marches-note">+ {foodTrucksVariables.map(f => f.commune).join(', ')} (jours variables)</p>
+          <p class="carte-info-contenu">Aucun food truck recensé.</p>
         )}
         <a href="/autour-de-rennes/foodtrucks/" class="lien-plus">Tous les food trucks →</a>
       </div>
 
-      <div class="bandeau-bloc" id="bloc-air">
-        <p class="bandeau-air-titre">Qualité de l'air</p>
-        <p class="bandeau-meteo-contenu">Chargement…</p>
+      <div class="carte-info" id="bloc-carburants">
+        <p class="carte-info-titre">Carburants à proximité</p>
+        <p class="carte-info-contenu">Chargement…</p>
       </div>
-
-      <div class="bandeau-bloc" id="bloc-carburants">
-        <p class="bandeau-carburants-titre">Carburants à proximité</p>
-        <p class="bandeau-meteo-contenu">Chargement…</p>
-      </div>
-    </section>
+    </div>
 
     <h1 class="titre-page">Que faire à Rennes<br />et alentours ?</h1>
     <p class="chapo-page">Braderies, brocantes, marchés et rendez-vous culturels du bassin rennais, mis à jour chaque jour.</p>
@@ -199,7 +190,6 @@ if (foodTrucksAujourdhui.length === 0) {
   </footer>
 
   <script>
-    // Filtres par categorie (interactif, cote client)
     const boutonsFiltres = document.querySelectorAll('.filtre-chip');
     const cartesEvenements = document.querySelectorAll('.carte-evenement');
 
@@ -242,7 +232,7 @@ if (foodTrucksAujourdhui.length === 0) {
       const bloc = document.getElementById('bloc-meteo');
       if (!bloc) return;
       try {
-        const url = 'https://api.open-meteo.com/v1/forecast?latitude=48.04114&longitude=-1.423929&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Europe%2FParis&forecast_days=7';
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=48.04114&longitude=-1.423929&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Europe%2FParis&forecast_days=4';
         const reponse = await fetch(url);
         const data = await reponse.json();
 
@@ -250,7 +240,7 @@ if (foodTrucksAujourdhui.length === 0) {
         const codeActuel = data.current.weather_code;
         const descActuelle = codesMeteo[codeActuel] || '';
 
-        const previsions = data.daily.time.slice(1, 6).map((date, i) => {
+        const previsions = data.daily.time.slice(1, 4).map((date, i) => {
           const jour = new Date(date).toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '');
           const max = Math.round(data.daily.temperature_2m_max[i + 1]);
           const min = Math.round(data.daily.temperature_2m_min[i + 1]);
@@ -260,12 +250,12 @@ if (foodTrucksAujourdhui.length === 0) {
         }).join('');
 
         bloc.innerHTML = `
-          <p class="bandeau-meteo-titre">Météo à Chaumeré</p>
-          <p class="bandeau-meteo-actuelle">${descActuelle} — ${tempActuelle}°C</p>
+          <p class="carte-info-titre">Météo à Chaumeré</p>
+          <p class="carte-info-forte">${descActuelle} — ${tempActuelle}°C</p>
           <div class="previsions-semaine">${previsions}</div>
         `;
       } catch (e) {
-        bloc.innerHTML = '<p class="bandeau-meteo-titre">Météo à Chaumeré</p><p class="bandeau-meteo-contenu">Indisponible pour le moment.</p>';
+        bloc.innerHTML = '<p class="carte-info-titre">Météo à Chaumeré</p><p class="carte-info-contenu">Indisponible pour le moment.</p>';
       }
     }
     chargerMeteo();
@@ -281,27 +271,24 @@ if (foodTrucksAujourdhui.length === 0) {
         const stationsGazole = data.results
           .filter(s => s.gazole_prix)
           .sort((a, b) => a.gazole_prix - b.gazole_prix)
-          .slice(0, 4);
+          .slice(0, 2);
 
         if (stationsGazole.length === 0) {
-          bloc.innerHTML = '<p class="bandeau-carburants-titre">Carburants</p><p class="bandeau-meteo-contenu">Aucune donnée disponible.</p>';
+          bloc.innerHTML = '<p class="carte-info-titre">Carburants</p><p class="carte-info-contenu">Aucune donnée disponible.</p>';
           return;
         }
 
         const lignes = stationsGazole.map(s => `
-          <li>
-            <span class="carburant-ville">${s.ville}</span>
-            <span class="carburant-prix">${s.gazole_prix.toFixed(3)} €</span>
-          </li>
+          <li>${s.ville} <span class="liste-courte-detail">— ${s.gazole_prix.toFixed(3)} €</span></li>
         `).join('');
 
         bloc.innerHTML = `
-          <p class="bandeau-carburants-titre">Gazole le moins cher (20km)</p>
-          <ul class="liste-carburants">${lignes}</ul>
+          <p class="carte-info-titre">Gazole le moins cher</p>
+          <ul class="liste-courte">${lignes}</ul>
           <a href="/autour-de-rennes/carburants/" class="lien-plus">Voir tous les carburants →</a>
         `;
       } catch (e) {
-        bloc.innerHTML = '<p class="bandeau-carburants-titre">Carburants</p><p class="bandeau-meteo-contenu">Indisponible pour le moment.</p>';
+        bloc.innerHTML = '<p class="carte-info-titre">Carburants</p><p class="carte-info-contenu">Indisponible pour le moment.</p>';
       }
     }
     chargerCarburants();
@@ -315,7 +302,7 @@ if (foodTrucksAujourdhui.length === 0) {
     }
 
     async function chargerAir() {
-      const bloc = document.getElementById('bloc-air');
+      const bloc = document.getElementById('bandeau-air-court');
       if (!bloc) return;
       try {
         const url = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=48.04114&longitude=-1.423929&current=european_aqi&hourly=birch_pollen,grass_pollen,alder_pollen,ragweed_pollen,mugwort_pollen,olive_pollen&timezone=Europe%2FParis&forecast_days=1';
@@ -335,18 +322,11 @@ if (foodTrucksAujourdhui.length === 0) {
           { nom: 'Olivier', valeur: data.hourly.olive_pollen[heureActuelle] }
         ].filter(p => p.valeur !== null && p.valeur > 5);
 
-        const pollensTexte = pollens.length > 0
-          ? pollens.map(p => p.nom).join(', ')
-          : 'Aucun pollen significatif';
+        const pollensTexte = pollens.length > 0 ? ` · Pollens : ${pollens.map(p => p.nom).join(', ')}` : '';
 
-        bloc.innerHTML = `
-          <p class="bandeau-air-titre">Qualité de l'air</p>
-          <p class="bandeau-aqi ${cat.classe}">${cat.label} <span class="aqi-valeur">(indice ${aqi})</span></p>
-          <p class="bandeau-pollens">🌾 Pollens : ${pollensTexte}</p>
-          <a href="/autour-de-rennes/qualite-air/" class="lien-plus">Comparer en Bretagne →</a>
-        `;
+        bloc.innerHTML = `Qualité de l'air : <strong class="${cat.classe}">${cat.label}</strong> (indice ${aqi})${pollensTexte} — <a href="/autour-de-rennes/qualite-air/" class="bandeau-court-lien">Comparer en Bretagne →</a>`;
       } catch (e) {
-        bloc.innerHTML = '<p class="bandeau-air-titre">Qualité de l\'air</p><p class="bandeau-meteo-contenu">Indisponible pour le moment.</p>';
+        bloc.innerHTML = "Qualité de l'air : indisponible pour le moment.";
       }
     }
     chargerAir();
