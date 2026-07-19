@@ -1,1 +1,57 @@
+---
+import { pharmaciesGarde } from '../../data/pharmacies-garde.js';
+---
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pharmacie de garde près de Domagné | Autour de Rennes</title>
+  <meta name="description" content="Trouvez la pharmacie de garde ce soir ou ce week-end près de Domagné, Châteaubourg, Châteaugiron et Janzé." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
+      <nav class="nav-entete">
+        <a href="/autour-de-rennes/annuaire/">Annuaire</a>
+        <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
+        <span class="sous-titre-site">L'agenda des sorties locales</span>
+      </nav>
+    </div>
+  </header>
 
+  <main class="conteneur">
+    <a href="/autour-de-rennes/agenda/" class="fil-retour">← Retour à l'agenda</a>
+    <h1 class="titre-page">Pharmacie de garde</h1>
+
+    <div class="encart-urgence">
+      <p class="encart-urgence-numero">📞 3237</p>
+      <p class="encart-urgence-texte">Pour connaître la pharmacie de garde <strong>précisément aujourd'hui</strong>, appelez ce numéro national — c'est la seule source officielle en temps réel. La liste ci-dessous indique les pharmacies qui participent au roulement de garde du secteur, pas celle de garde ce jour précis.</p>
+    </div>
+
+    <h2 class="sous-titre-section">Pharmacies du secteur (roulement de garde)</h2>
+    <div class="liste-commerces">
+      {pharmaciesGarde.map(p => (
+        <div class="ligne-commerce ligne-commerce-empilee">
+          <div class="ligne-commerce-principal">
+            <span class="ligne-commerce-nom">{p.nom}</span>
+            <span class="ligne-commerce-commune">{p.commune} — {p.typeGarde}</span>
+          </div>
+          <div class="ligne-commerce-secondaire">
+            <a href={`tel:${p.telephone.replace(/\s/g, '')}`} class="ligne-commerce-tel">📞 {p.telephone}</a>
+          </div>
+          <p class="ligne-commerce-note">{p.adresse} · {p.note}</p>
+        </div>
+      ))}
+    </div>
+  </main>
+
+  <footer class="pied-site">
+    <p>Autour de Rennes — annuaire local, mis à jour manuellement.</p>
+  </footer>
+</body>
+</html>
