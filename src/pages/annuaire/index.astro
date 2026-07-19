@@ -1,1 +1,168 @@
+---
+import { annuaire } from '../../data/annuaire.js';
+---
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ouvert maintenant : artisans et commerces | Autour de Rennes</title>
+  <meta name="description" content="Boulangeries, restaurants, artisans et services ouverts maintenant près de Domagné, Châteaubourg, Châteaugiron et le secteur." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
+      <nav class="nav-entete">
+        <a href="/autour-de-rennes/annuaire/">Annuaire</a>
+        <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
+        <span class="sous-titre-site">L'agenda des sorties locales</span>
+      </nav>
+    </div>
+  </header>
 
+  <main class="conteneur">
+    <a href="/autour-de-rennes/agenda/" class="fil-retour">← Retour à l'agenda</a>
+    <h1 class="titre-page">Artisans & commerces</h1>
+    <p class="chapo-page" id="sous-titre-annuaire">Chargement…</p>
+
+    <button id="btn-voir-tous" class="btn-toggle">Voir aussi les commerces fermés</button>
+
+    <div id="contenu-annuaire">
+      <p>Chargement…</p>
+    </div>
+  </main>
+
+  <footer class="pied-site">
+    <p>Autour de Rennes — annuaire local, mis à jour manuellement.</p>
+  </footer>
+
+  <script define:vars={{ annuaire }}>
+    const joursIndex = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+
+    function estOuvertMaintenant(horaires) {
+      if (!horaires) return null;
+      const maintenant = new Date();
+      const jour = joursIndex[maintenant.getDay()];
+      const infosJour = horaires[jour];
+      if (!infosJour) return false;
+
+      const heureActuelle = maintenant.getHours() * 60 + maintenant.getMinutes();
+
+      function dansCreneau(creneau) {
+        if (!creneau) return false;
+        const [debut, fin] = creneau;
+        const [hD, mD] = debut.split(':').map(Number);
+        const [hF, mF] = fin.split(':').map(Number);
+        return heureActuelle >= (hD * 60 + mD) && heureActuelle < (hF * 60 + mF);
+      }
+
+      return dansCreneau(infosJour.matin) || dansCreneau(infosJour.apresmidi);
+    }
+
+    function formaterProchainCreneau(horaires) {
+      if (!horaires) return null;
+      const maintenant = new Date();
+      for (let decalage = 0; decalage < 8; decalage++) {
+        const d = new Date(maintenant);
+        d.setDate(d.getDate() + decalage);
+        const jour = joursIndex[d.getDay()];
+        const infosJour = horaires[jour];
+        if (!infosJour) continue;
+        const creneaux = [infosJour.matin, infosJour.apresmidi].filter(Boolean);
+        for (const c of creneaux) {
+          const [hD, mD] = c[0].split(':').map(Number);
+          const debutMin = hD * 60 + mD;
+          if (decalage > 0 || (maintenant.getHours() * 60 + maintenant.getMinutes()) < debutMin) {
+            const label = decalage === 0 ? "aujourd'hui" : jour;
+            return `${label} à ${c[0]}`;
+          }
+        }
+      }
+      return null;
+    }
+
+    function ligneCommerce(item, statut) {
+      let badge = '';
+      if (statut === true) badge = '<span class="badge-ouvert">Ouvert</span>';
+      else if (statut === false) {
+        const prochain = formaterProchainCreneau(item.horaires);
+        badge = `<span class="badge-ferme">Fermé${prochain ? ' · réouvre ' + prochain : ''}</span>`;
+      } else {
+        badge = '<span class="badge-inconnu">Horaires non communiqués</span>';
+      }
+
+      return `
+        <div class="ligne-commerce">
+          <div class="ligne-commerce-principal">
+            <span class="ligne-commerce-nom">${item.nom}</span>
+            <span class="ligne-commerce-commune">${item.commune}</span>
+          </div>
+          <div class="ligne-commerce-secondaire">
+            ${badge}
+            <a href="tel:${item.telephone.replace(/\s/g, '')}" class="ligne-commerce-tel">📞 ${item.telephone}</a>
+          </div>
+        </div>
+      `;
+    }
+
+    let voirTous = false;
+
+    function afficher() {
+      const conteneur = document.getElementById('contenu-annuaire');
+      const sousTitre = document.getElementById('sous-titre-annuaire');
+
+      const avecStatut = annuaire.map(item => ({ item, statut: estOuvertMaintenant(item.horaires) }));
+      const ouverts = avecStatut.filter(a => a.statut === true);
+      const fermes = avecStatut.filter(a => a.statut === false);
+      const inconnus = avecStatut.filter(a => a.statut === null);
+
+      sousTitre.textContent = `${ouverts.length} commerce${ouverts.length > 1 ? 's' : ''} ouvert${ouverts.length > 1 ? 's' : ''} en ce moment.`;
+
+      function grouperParCategorie(liste) {
+        const groupes = {};
+        for (const { item, statut } of liste) {
+          const cat = item.categorie.split(' / ')[0];
+          if (!groupes[cat]) groupes[cat] = [];
+          groupes[cat].push(ligneCommerce(item, statut));
+        }
+        return Object.keys(groupes).sort().map(cat => `
+          <section class="section-annuaire">
+            <h2 class="sous-titre-section">${cat}</h2>
+            <div class="liste-commerces">${groupes[cat].join('')}</div>
+          </section>
+        `).join('');
+      }
+
+      let html = '';
+      if (ouverts.length > 0) {
+        html += grouperParCategorie(ouverts);
+      } else {
+        html += '<p class="bandeau-marches-vide">Aucun commerce recensé n\'est ouvert pour le moment.</p>';
+      }
+
+      if (voirTous) {
+        if (fermes.length > 0) {
+          html += '<h2 class="sous-titre-section-majeur">Fermés actuellement</h2>' + grouperParCategorie(fermes);
+        }
+        if (inconnus.length > 0) {
+          html += '<h2 class="sous-titre-section-majeur">Horaires non communiqués</h2>' + grouperParCategorie(inconnus);
+        }
+      }
+
+      conteneur.innerHTML = html;
+    }
+
+    document.getElementById('btn-voir-tous').addEventListener('click', (e) => {
+      voirTous = !voirTous;
+      e.target.textContent = voirTous ? 'Masquer les commerces fermés' : 'Voir aussi les commerces fermés';
+      afficher();
+    });
+
+    afficher();
+  </script>
+</body>
+</html>
