@@ -95,6 +95,24 @@ body {
   color: var(--marque);
 }
 
+.btn-gite {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  padding: 0.55rem 1.1rem;
+  border-radius: 0.65rem;
+  text-decoration: none;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-gite:hover {
+  background: #ea580c;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
 .conteneur {
   max-width: 960px;
   margin: 0 auto;
@@ -304,6 +322,38 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
+}
+
+.filtres-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.filtre-chip {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1.1rem;
+  border-radius: 100px;
+  border: 1px solid var(--ligne);
+  background: var(--surface);
+  color: var(--texte-mute);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filtre-chip:hover {
+  border-color: var(--marque);
+  color: var(--marque);
+}
+
+.filtre-chip-actif,
+.filtre-chip-actif:hover {
+  background: var(--texte);
+  border-color: var(--texte);
+  color: #fff;
 }
 
 .carte-evenement {
