@@ -36,7 +36,8 @@ function normalizeDatatourisme(item) {
 }
 
 async function fetchDatatourisme() {
-  const url = `https://api.datatourisme.fr/v1/entertainmentAndEvent?filters=isLocatedAt.address.hasAddressCity.insee[in]=35238,35113,35360&fields=uuid,label,takesPlaceAt,isLocatedAt,hasDescription,lastUpdate,hasContact&lang=fr&page_size=20`;
+  // Codes INSEE : Rennes 35238, Domagne 35113, Vitre 35360, Janze 35136, Chateaugiron 35069
+  const url = `https://api.datatourisme.fr/v1/entertainmentAndEvent?filters=isLocatedAt.address.hasAddressCity.insee[in]=35238,35113,35360,35136,35069&fields=uuid,label,takesPlaceAt,isLocatedAt,hasDescription,lastUpdate,hasContact&lang=fr&page_size=40`;
   const response = await fetch(url, {
     headers: { 'X-API-Key': DATATOURISME_API_KEY }
   });
@@ -101,8 +102,6 @@ async function genererArticle(eventData) {
   return JSON.parse(texteJson);
 }
 
-// Retire les caracteres de controle invalides (byte nul et autres) qui peuvent
-// occasionnellement apparaitre dans une reponse IA et casser le parsing YAML/Markdown
 function nettoyerTexte(texte) {
   if (typeof texte !== 'string') return texte;
   return texte.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
@@ -161,8 +160,6 @@ function attendre(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Limite de securite : on ne depasse jamais ce nombre d'appels Gemini par execution du script,
-// meme si le quota reel est plus eleve - filet de securite contre tout bug ou boucle infinie.
 const LIMITE_SECURITE_GEMINI = 100;
 
 async function main() {
