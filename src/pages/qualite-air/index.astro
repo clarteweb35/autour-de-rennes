@@ -1,1 +1,110 @@
+---
+---
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Qualité de l'air en Bretagne | Autour de Rennes</title>
+  <meta name="description" content="Comparez la qualité de l'air entre Chaumeré, Rennes, et les principales villes de Bretagne pour organiser votre journée." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
+      <span class="sous-titre-site">L'agenda des sorties locales</span>
+    </div>
+  </header>
 
+  <main class="conteneur">
+    <a href="/autour-de-rennes/agenda/" class="fil-retour">← Retour à l'agenda</a>
+    <h1 class="titre-page">Qualité de l'air en Bretagne</h1>
+    <p class="chapo-page">De quoi organiser votre journée : où l'air est le plus pur, où il vaut mieux éviter les activités de plein air prolongées.</p>
+    <p class="note-precision">Ces données proviennent d'un modèle de prévision (résolution 11km), pas de stations de mesure physiques dans chaque ville — une bonne indication, mais moins précise qu'une station officielle locale.</p>
+
+    <div id="resultats-air">
+      <p>Chargement des données pour 16 villes de Bretagne…</p>
+    </div>
+  </main>
+
+  <footer class="pied-site">
+    <p>Autour de Rennes — données de qualité de l'air issues du modèle CAMS Europe (Open-Meteo).</p>
+  </footer>
+
+  <script>
+    const villes = [
+      { nom: "Chaumeré (Domagné)", lat: 48.04114, lon: -1.423929, phare: true },
+      { nom: "Rennes", lat: 48.1173, lon: -1.6778 },
+      { nom: "Saint-Malo", lat: 48.6493, lon: -2.0257 },
+      { nom: "Fougères", lat: 48.3492, lon: -1.1998 },
+      { nom: "Vitré", lat: 48.1179, lon: -1.2101 },
+      { nom: "Redon", lat: 47.6499, lon: -2.0847 },
+      { nom: "Combourg", lat: 48.4092, lon: -1.7514 },
+      { nom: "Bain-de-Bretagne", lat: 47.8377, lon: -1.6803 },
+      { nom: "Dinard", lat: 48.6317, lon: -2.0605 },
+      { nom: "Brest", lat: 48.3904, lon: -4.4861 },
+      { nom: "Quimper", lat: 47.9960, lon: -4.1024 },
+      { nom: "Lorient", lat: 47.7482, lon: -3.3660 },
+      { nom: "Vannes", lat: 47.6582, lon: -2.7608 },
+      { nom: "Saint-Brieuc", lat: 48.5136, lon: -2.7652 },
+      { nom: "Pontivy", lat: 48.0667, lon: -2.9667 },
+      { nom: "Lannion", lat: 48.7325, lon: -3.4602 },
+    ];
+
+    function categorieAQI(valeur) {
+      if (valeur <= 20) return { label: 'Bon', classe: 'aqi-bon' };
+      if (valeur <= 40) return { label: 'Moyen', classe: 'aqi-moyen' };
+      if (valeur <= 60) return { label: 'Dégradé', classe: 'aqi-degrade' };
+      if (valeur <= 80) return { label: 'Mauvais', classe: 'aqi-mauvais' };
+      return { label: 'Très mauvais', classe: 'aqi-tres-mauvais' };
+    }
+
+    async function recupererAQI(ville) {
+      try {
+        const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${ville.lat}&longitude=${ville.lon}&current=european_aqi`;
+        const reponse = await fetch(url);
+        const data = await reponse.json();
+        return { ...ville, aqi: Math.round(data.current.european_aqi) };
+      } catch (e) {
+        return { ...ville, aqi: null };
+      }
+    }
+
+    function ligneVille(v) {
+      const cat = categorieAQI(v.aqi);
+      return `
+        <li class="ligne-air ${v.phare ? 'ligne-air-phare' : ''}">
+          <span class="air-ville">${v.nom}</span>
+          <span class="air-badge ${cat.classe}">${cat.label} — ${v.aqi}</span>
+        </li>
+      `;
+    }
+
+    async function chargerClassement() {
+      const conteneur = document.getElementById('resultats-air');
+      const resultats = (await Promise.all(villes.map(recupererAQI))).filter(v => v.aqi !== null);
+
+      const chaumere = resultats.find(v => v.phare);
+      const autres = resultats.filter(v => !v.phare).sort((a, b) => a.aqi - b.aqi);
+
+      const meilleures = autres.slice(0, 5);
+      const pires = autres.slice(-5).reverse();
+
+      conteneur.innerHTML = `
+        <h2 class="sous-titre-section">📍 Chez vous</h2>
+        <ul class="liste-air">${ligneVille(chaumere)}</ul>
+
+        <h2 class="sous-titre-section">🌿 Air le plus pur aujourd'hui</h2>
+        <ul class="liste-air">${meilleures.map(ligneVille).join('')}</ul>
+
+        <h2 class="sous-titre-section">⚠️ Air le plus dégradé aujourd'hui</h2>
+        <ul class="liste-air">${pires.map(ligneVille).join('')}</ul>
+      `;
+    }
+    chargerClassement();
+  </script>
+</body>
+</html>
