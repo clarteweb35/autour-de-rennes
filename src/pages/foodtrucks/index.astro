@@ -1,1 +1,83 @@
+---
+import { foodTrucks } from '../../data/foodtrucks.js';
 
+const ordreJours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+const foodTrucksFixes = foodTrucks.filter(f => f.jour !== 'variable');
+const foodTrucksVariables = foodTrucks.filter(f => f.jour === 'variable');
+---
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Food trucks du secteur | Autour de Rennes</title>
+  <meta name="description" content="Retrouvez tous les food trucks de la semaine autour de Domagné, Châteaubourg, Châteaugiron et Domloup." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
+      <nav class="nav-entete">
+        <a href="/autour-de-rennes/annuaire/">Annuaire</a>
+        <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
+        <span class="sous-titre-site">L'agenda des sorties locales</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="conteneur">
+    <a href="/autour-de-rennes/agenda/" class="fil-retour">← Retour à l'agenda</a>
+    <h1 class="titre-page">Food trucks de la semaine</h1>
+    <p class="chapo-page">Tous les camions du secteur, jour par jour.</p>
+
+    {ordreJours.map(jour => {
+      const trucksDuJour = foodTrucksFixes.filter(f => f.jour === jour);
+      if (trucksDuJour.length === 0) return null;
+      return (
+        <section class="section-annuaire">
+          <h2 class="sous-titre-section">{jour.charAt(0).toUpperCase() + jour.slice(1)}</h2>
+          <div class="liste-commerces">
+            {trucksDuJour.map(f => (
+              <div class="ligne-commerce">
+                <div class="ligne-commerce-principal">
+                  <span class="ligne-commerce-nom">{f.nom}</span>
+                  <span class="ligne-commerce-commune">{f.commune} — {f.moment}</span>
+                </div>
+                <div class="ligne-commerce-secondaire">
+                  <span class="ligne-commerce-tel">📍 {f.lieu}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    })}
+
+    {foodTrucksVariables.length > 0 && (
+      <section class="section-annuaire">
+        <h2 class="sous-titre-section">Jours variables</h2>
+        <div class="liste-commerces">
+          {foodTrucksVariables.map(f => (
+            <div class="ligne-commerce">
+              <div class="ligne-commerce-principal">
+                <span class="ligne-commerce-nom">{f.nom}</span>
+                <span class="ligne-commerce-commune">{f.commune} — {f.moment}</span>
+              </div>
+              <div class="ligne-commerce-secondaire">
+                <span class="ligne-commerce-tel">📍 {f.lieu}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+  </main>
+
+  <footer class="pied-site">
+    <p>Autour de Rennes — planning food trucks mis à jour manuellement.</p>
+  </footer>
+</body>
+</html>
