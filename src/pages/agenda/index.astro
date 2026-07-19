@@ -72,7 +72,7 @@ if (foodTrucksAujourdhui.length === 0) {
   <meta name="description" content="Braderies, brocantes, événements culturels : découvrez l'agenda complet des sorties à Rennes et alentours." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
 </head>
 <body>
@@ -118,7 +118,7 @@ if (foodTrucksAujourdhui.length === 0) {
         {foodTrucksAujourdhui.length > 0 ? (
           <ul class="liste-marches">
             {foodTrucksAujourdhui.map(f => (
-              <li>{f.nom} <span class="marche-horaire">— {f.commune} ({f.moment})</span></li>
+              <li>{f.nom} <span class="marche-horaire">— {f.specialite} ({f.commune})</span></li>
             ))}
           </ul>
         ) : prochainsFoodTrucks.length > 0 ? (
@@ -127,7 +127,7 @@ if (foodTrucksAujourdhui.length === 0) {
             <p class="bandeau-marches-prochain">Prochain : <strong>{prochainJourLabel}</strong></p>
             <ul class="liste-marches">
               {prochainsFoodTrucks.map(f => (
-                <li>{f.nom} <span class="marche-horaire">— {f.commune} ({f.moment})</span></li>
+                <li>{f.nom} <span class="marche-horaire">— {f.specialite} ({f.commune})</span></li>
               ))}
             </ul>
           </>
