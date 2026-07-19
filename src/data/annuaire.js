@@ -1,0 +1,17 @@
+export const annuaire = [
+  { categorie: "Alimentation / Boulangerie", nom: "Boulangerie LOISANCE", commune: "Piré-Chancé", adresse: "Centre-bourg", telephone: "02 99 44 41 54", web: "Via Intramuros" },
+  { categorie: "Restauration", nom: "ROZA Restaurant & Bar", commune: "Châteaubourg", adresse: "Espace Fayelle", telephone: "02 58 47 35 45", web: "castelartcom.fr" },
+  { categorie: "Restauration", nom: "B FAST FOOD", commune: "Bais", adresse: "13, place de l'Ancien Marché", telephone: "02 90 70 33 09", web: "bais35.fr" },
+  { categorie: "Services / Auto", nom: "Sécuritest Auto Bilan", commune: "Châteaubourg", adresse: "Zone Artisanale", telephone: "02 99 00 87 22", web: "castelartcom.fr" },
+  { categorie: "Bâtiment / Électricité", nom: "3B Elec", commune: "Châteaubourg", adresse: "Rue de Rennes", telephone: "07 59 60 70 42", web: "castelartcom.fr" },
+  { categorie: "Commerce / Animalerie", nom: "ACAN Animal & Nutrition", commune: "Bais", adresse: "40, Rue des Tisserands", telephone: "07 43 61 09 99", web: "acananimal.fr" },
+  { categorie: "Artisanat / Cycles", nom: "AC MECANIC", commune: "Bais", adresse: "35, rue de la Fontaine", telephone: "07 88 36 61 62", web: "AC-Mecanic.com" },
+  { categorie: "Bâtiment / Peinture", nom: "Fabrice Niel Peinture", commune: "Janzé", adresse: "Zone Artisanale", telephone: "06 00 00 00 00", web: "UCAJ Janzé" },
+  { categorie: "Restauration / Hôtel", nom: "Auberge des Tilleuls", commune: "Piré-Chancé", adresse: "Place de l'Église", telephone: "02 99 44 40 00", web: "Intramuros" },
+  { categorie: "Services / Beauté", nom: "Le Salon de Manuella", commune: "Piré-Chancé", adresse: "Rue principale", telephone: "02 99 44 45 45", web: "Intramuros" },
+  { categorie: "Alimentation / Boulangerie", nom: "Boulangerie Artisanale", commune: "Domagné", adresse: "Place de l'Église", telephone: "02 99 00 00 00", web: "PagesJaunes" },
+  { categorie: "Bâtiment / Terrassement", nom: "Domagné TP", commune: "Domagné", adresse: "Zone Artisanale", telephone: "02 99 49 00 00", web: "Mairie Domagné" },
+  { categorie: "Commerce / Fleurs", nom: "Châteaugiron Fleurs", commune: "Châteaugiron", adresse: "Rue de la Madeleine", telephone: "02 99 37 00 00", web: "Infolocale" },
+  { categorie: "Alimentation / Boucherie", nom: "Boucherie Castelgironnaise", commune: "Châteaugiron", adresse: "Grande Rue", telephone: "02 99 37 11 11", web: "Infolocale" },
+  { categorie: "Services / Coiffure", nom: "Domloup Coiffure", commune: "Domloup", adresse: "Centre Commercial", telephone: "02 99 37 22 22", web: "Mairie Domloup" },
+];
