@@ -1,0 +1,95 @@
+---
+---
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prix des carburants près de Domagné | Autour de Rennes</title>
+  <meta name="description" content="Comparez les prix de tous les carburants (Gazole, SP95, SP98, E10) dans les stations autour de Domagné et Rennes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
+      <span class="sous-titre-site">L'agenda des sorties locales</span>
+    </div>
+  </header>
+
+  <main class="conteneur">
+    <a href="/autour-de-rennes/agenda/" class="fil-retour">← Retour à l'agenda</a>
+    <h1 class="titre-page">Carburants à proximité</h1>
+    <p class="chapo-page">Toutes les stations dans un rayon de 20 km autour de Domagné, triées par distance, avec le détail de chaque carburant.</p>
+
+    <div id="liste-stations">
+      <p>Chargement des données…</p>
+    </div>
+  </main>
+
+  <footer class="pied-site">
+    <p>Autour de Rennes — données carburants issues de l'API officielle du Ministère de l'Économie.</p>
+  </footer>
+
+  <script>
+    function distanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    async function chargerStations() {
+      const conteneur = document.getElementById('liste-stations');
+      try {
+        const url = "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=distance(geom,%20geom%27POINT(-1.423929%2048.04114)%27,%2020km)&limit=40";
+        const reponse = await fetch(url);
+        const data = await reponse.json();
+
+        const stations = data.results
+          .filter(s => s.geom && (s.gazole_prix || s.sp95_prix || s.sp98_prix || s.e10_prix))
+          .map(s => ({ ...s, distance: distanceKm(48.04114, -1.423929, s.geom.lat, s.geom.lon) }))
+          .sort((a, b) => a.distance - b.distance);
+
+        if (stations.length === 0) {
+          conteneur.innerHTML = '<p>Aucune donnée disponible pour le moment.</p>';
+          return;
+        }
+
+        conteneur.innerHTML = `
+          <table class="table-carburants">
+            <thead>
+              <tr>
+                <th>Station</th>
+                <th>Distance</th>
+                <th>Gazole</th>
+                <th>SP95</th>
+                <th>SP98</th>
+                <th>E10</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${stations.map(s => `
+                <tr>
+                  <td>${s.ville}<br /><span class="station-adresse">${s.adresse || ''}</span></td>
+                  <td>${s.distance.toFixed(1)} km</td>
+                  <td>${s.gazole_prix ? s.gazole_prix.toFixed(3) + ' €' : '—'}</td>
+                  <td>${s.sp95_prix ? s.sp95_prix.toFixed(3) + ' €' : '—'}</td>
+                  <td>${s.sp98_prix ? s.sp98_prix.toFixed(3) + ' €' : '—'}</td>
+                  <td>${s.e10_prix ? s.e10_prix.toFixed(3) + ' €' : '—'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (e) {
+        conteneur.innerHTML = '<p>Impossible de charger les données pour le moment.</p>';
+      }
+    }
+    chargerStations();
+  </script>
+</body>
+</html>
