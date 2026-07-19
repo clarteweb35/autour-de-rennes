@@ -137,79 +137,122 @@ body {
   margin: 0 0 2.5rem;
 }
 
-.bandeau-jour {
+/* ===== Bandeau court (date/heure/fete + qualite air) ===== */
+.bandeau-court {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--ligne);
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.bandeau-court-date {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bandeau-court-jour {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texte-mute);
+}
+
+.bandeau-court-heure {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--texte);
+}
+
+.bandeau-court-saint {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.bandeau-court-air {
+  font-size: 0.85rem;
+  color: var(--texte-mute);
+}
+
+.bandeau-court-lien {
+  font-weight: 600;
+  color: var(--marque);
+  text-decoration: none;
+}
+
+.bandeau-court-lien:hover {
+  text-decoration: underline;
+}
+
+/* ===== Grille de 4 cartes resumees ===== */
+.grille-infos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.75rem;
   margin-bottom: 2.5rem;
 }
 
-.bandeau-bloc {
+.carte-info {
   background: var(--surface);
   border: 1px solid var(--ligne);
   border-radius: 1rem;
-  padding: 1.25rem 1.25rem 2.4rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  text-align: left;
-  gap: 0.25rem;
+  padding: 1.1rem 1.25rem 2.3rem;
   position: relative;
+  min-height: 108px;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: box-shadow 0.2s ease;
 }
 
-.bandeau-bloc:hover {
+.carte-info:hover {
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 
-.bandeau-jour-texte {
+.carte-info-titre {
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--texte-mute);
-  margin: 0 0 0.3rem;
+  margin: 0 0 0.55rem;
 }
 
-.bandeau-heure {
+.carte-info-forte {
   font-family: var(--font-display);
+  font-size: 0.98rem;
   font-weight: 700;
-  font-size: 1.7rem;
-  color: var(--texte);
-  margin: 0 0 0.3rem;
-}
-
-.bandeau-saint {
-  font-size: 0.82rem;
-  color: var(--accent);
-  font-weight: 600;
-  margin: 0;
-}
-
-.bandeau-meteo-titre,
-.bandeau-marches-titre,
-.bandeau-air-titre,
-.bandeau-carburants-titre {
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--texte-mute);
   margin: 0 0 0.5rem;
 }
 
-.bandeau-meteo-actuelle {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 0.6rem;
+.carte-info-contenu {
+  font-size: 0.85rem;
+  color: var(--texte-mute);
+  margin: 0;
 }
 
-.bandeau-meteo-contenu {
-  font-size: 0.9rem;
+.liste-courte {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.liste-courte li {
+  padding: 0.1rem 0;
+  color: var(--texte);
+}
+
+.liste-courte-detail {
   color: var(--texte-mute);
+  font-size: 0.78rem;
 }
 
 .previsions-semaine {
@@ -227,57 +270,6 @@ body {
   text-transform: capitalize;
 }
 
-.liste-marches,
-.liste-carburants {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: 0.85rem;
-  width: 100%;
-}
-
-.liste-marches li {
-  padding: 0.15rem 0;
-}
-
-.liste-carburants li {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.2rem 0;
-}
-
-.marche-horaire,
-.carburant-ville {
-  color: var(--texte-mute);
-  font-size: 0.8rem;
-}
-
-.carburant-prix {
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.bandeau-marches-vide {
-  font-size: 0.88rem;
-  color: var(--texte-mute);
-  margin: 0;
-}
-
-.bandeau-marches-note {
-  font-size: 0.75rem;
-  color: var(--texte-mute);
-  margin: 0.5rem 0 0;
-  font-style: italic;
-}
-
-.bandeau-marches-prochain {
-  font-size: 0.85rem;
-  color: var(--accent);
-  margin: 0 0 0.4rem;
-  font-weight: 600;
-}
-
 .lien-plus {
   position: absolute;
   bottom: 0.8rem;
@@ -292,30 +284,12 @@ body {
   text-decoration: underline;
 }
 
-.bandeau-aqi {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem;
-}
-
-.aqi-valeur {
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: var(--texte-mute);
-}
-
 .aqi-bon { color: var(--marque); }
 .aqi-moyen { color: var(--accent); }
 .aqi-degrade { color: #ea580c; }
 .aqi-mauvais { color: #dc2626; }
 .aqi-tres-mauvais { color: #991b1b; }
 
-.bandeau-pollens {
-  font-size: 0.85rem;
-  color: var(--texte);
-  margin: 0;
-}
 
 .grille-evenements {
   display: grid;
@@ -782,7 +756,12 @@ body {
 }
 
 @media (max-width: 720px) {
-  .bandeau-jour { grid-template-columns: 1fr; }
+  .grille-infos { grid-template-columns: 1fr 1fr; }
+  .bandeau-court { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 480px) {
+  .grille-infos { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
