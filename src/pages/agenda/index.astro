@@ -1,9 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
+import { marches } from '../../data/marches.js';
+import { saints } from '../../data/saints.js';
+import { foodTrucks } from '../../data/foodtrucks.js';
 
 const articles = await getCollection('articles', ({ data }) => !data.needs_human_review);
 
-// On ne garde que les evenements dont la date de fin n'est pas deja passee
 const aujourdhui = new Date();
 aujourdhui.setHours(0, 0, 0, 0);
 
@@ -23,6 +25,45 @@ function formaterJourMois(dateStr: string) {
     mois: date.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '')
   };
 }
+
+function estLongueDuree(dateDebut: string, dateFin: string) {
+  const diffJours = (new Date(dateFin).getTime() - new Date(dateDebut).getTime()) / (1000 * 60 * 60 * 24);
+  return diffJours > 3;
+}
+
+const maintenant = new Date();
+const jourSemaineTexte = maintenant.toLocaleDateString('fr-FR', { weekday: 'long' });
+const dateLongue = maintenant.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+const cleJourMois = `${String(maintenant.getMonth() + 1).padStart(2, '0')}-${String(maintenant.getDate()).padStart(2, '0')}`;
+const saintDuJour = saints[cleJourMois] || null;
+
+const marchesAujourdhui = marches.filter(m => m.jour === jourSemaineTexte || m.jour === 'tous les jours');
+const foodTrucksAujourdhui = foodTrucks.filter(f => f.jour === jourSemaineTexte);
+const foodTrucksVariables = foodTrucks.filter(f => f.jour === 'variable');
+
+// Si rien aujourd'hui, on cherche le(s) prochain(s) food truck(s) a venir
+let prochainsFoodTrucks = [];
+let prochainJourLabel = '';
+if (foodTrucksAujourdhui.length === 0) {
+  const ordreJours = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  const indexAujourdhui = ordreJours.indexOf(jourSemaineTexte);
+  const foodTrucksFixes = foodTrucks.filter(f => f.jour !== 'variable');
+
+  let distanceMin = 8;
+  for (const f of foodTrucksFixes) {
+    const indexJour = ordreJours.indexOf(f.jour);
+    const distance = (indexJour - indexAujourdhui + 7) % 7;
+    if (distance > 0 && distance < distanceMin) distanceMin = distance;
+  }
+  prochainsFoodTrucks = foodTrucksFixes.filter(f => {
+    const indexJour = ordreJours.indexOf(f.jour);
+    const distance = (indexJour - indexAujourdhui + 7) % 7;
+    return distance === distanceMin;
+  });
+  if (prochainsFoodTrucks.length > 0) {
+    prochainJourLabel = prochainsFoodTrucks[0].jour.charAt(0).toUpperCase() + prochainsFoodTrucks[0].jour.slice(1);
+  }
+}
 ---
 <html lang="fr">
 <head>
@@ -39,21 +80,89 @@ function formaterJourMois(dateStr: string) {
   <header class="entete">
     <div class="entete-contenu">
       <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
-      <span class="sous-titre-site">L'agenda des sorties locales</span>
+      <nav class="nav-entete">
+        <a href="/autour-de-rennes/annuaire/">Annuaire</a>
+        <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
+        <span class="sous-titre-site">L'agenda des sorties locales</span>
+      </nav>
     </div>
   </header>
 
   <main class="conteneur">
+
+    <section class="bandeau-jour">
+      <div class="bandeau-bloc">
+        <p class="bandeau-jour-texte">{jourSemaineTexte} {dateLongue}</p>
+        <p class="bandeau-heure" id="horloge">--:--</p>
+        {saintDuJour && <p class="bandeau-saint">Bonne fête aux {saintDuJour} !</p>}
+      </div>
+
+      <div class="bandeau-bloc" id="bloc-meteo">
+        <p class="bandeau-meteo-titre">Météo à Chaumeré</p>
+        <p class="bandeau-meteo-contenu">Chargement…</p>
+      </div>
+
+      <div class="bandeau-bloc">
+        <p class="bandeau-marches-titre">Marché{marchesAujourdhui.length > 1 ? 's' : ''} aujourd'hui</p>
+        {marchesAujourdhui.length > 0 ? (
+          <ul class="liste-marches">
+            {marchesAujourdhui.map(m => (
+              <li>{m.commune} <span class="marche-horaire">— {m.horaire}</span></li>
+            ))}
+          </ul>
+        ) : (
+          <p class="bandeau-marches-vide">Aucun marché recensé aujourd'hui.</p>
+        )}
+      </div>
+      <div class="bandeau-bloc">
+        <p class="bandeau-marches-titre">Food trucks aujourd'hui</p>
+        {foodTrucksAujourdhui.length > 0 ? (
+          <ul class="liste-marches">
+            {foodTrucksAujourdhui.map(f => (
+              <li>{f.nom} <span class="marche-horaire">— {f.commune} ({f.moment})</span></li>
+            ))}
+          </ul>
+        ) : prochainsFoodTrucks.length > 0 ? (
+          <>
+            <p class="bandeau-marches-vide">Rien aujourd'hui.</p>
+            <p class="bandeau-marches-prochain">Prochain : <strong>{prochainJourLabel}</strong></p>
+            <ul class="liste-marches">
+              {prochainsFoodTrucks.map(f => (
+                <li>{f.nom} <span class="marche-horaire">— {f.commune} ({f.moment})</span></li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p class="bandeau-marches-vide">Aucun food truck recensé.</p>
+        )}
+        {foodTrucksVariables.length > 0 && (
+          <p class="bandeau-marches-note">+ {foodTrucksVariables.map(f => f.commune).join(', ')} (jours variables)</p>
+        )}
+      </div>
+
+      <div class="bandeau-bloc" id="bloc-air">
+        <p class="bandeau-air-titre">Qualité de l'air</p>
+        <p class="bandeau-meteo-contenu">Chargement…</p>
+      </div>
+
+      <div class="bandeau-bloc" id="bloc-carburants">
+        <p class="bandeau-carburants-titre">Carburants à proximité</p>
+        <p class="bandeau-meteo-contenu">Chargement…</p>
+      </div>
+    </section>
+
     <h1 class="titre-page">Que faire à Rennes<br />et alentours ?</h1>
     <p class="chapo-page">Braderies, brocantes, marchés et rendez-vous culturels du bassin rennais, mis à jour chaque jour.</p>
 
     <div class="grille-evenements">
       {articlesTries.map(article => {
         const d = article.data;
-        const { jour, mois } = formaterJourMois(d.date_debut);
+        const longueDuree = estLongueDuree(d.date_debut, d.date_fin);
+        const { jour, mois } = formaterJourMois(longueDuree ? d.date_fin : d.date_debut);
         return (
           <article class="carte-evenement">
             <div class="billet-date">
+              {longueDuree && <span class="billet-prefixe">Jusqu'au</span>}
               <span class="billet-jour">{jour}</span>
               <span class="billet-mois">{mois}</span>
             </div>
@@ -76,5 +185,142 @@ function formaterJourMois(dateStr: string) {
   <footer class="pied-site">
     <p>Autour de Rennes — agenda mis à jour automatiquement à partir de sources officielles.</p>
   </footer>
+
+  <script>
+    function majHorloge() {
+      const el = document.getElementById('horloge');
+      if (!el) return;
+      const maintenant = new Date();
+      el.textContent = maintenant.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    }
+    majHorloge();
+    setInterval(majHorloge, 1000 * 30);
+
+    const codesMeteo = {
+      0: '☀️ Ciel dégagé', 1: '🌤️ Peu nuageux', 2: '⛅ Partiellement nuageux', 3: '☁️ Couvert',
+      45: '🌫️ Brouillard', 48: '🌫️ Brouillard givrant',
+      51: '🌦️ Bruine légère', 53: '🌦️ Bruine', 55: '🌦️ Bruine forte',
+      61: '🌧️ Pluie légère', 63: '🌧️ Pluie', 65: '🌧️ Pluie forte',
+      71: '🌨️ Neige légère', 73: '🌨️ Neige', 75: '🌨️ Neige forte',
+      80: '🌦️ Averses', 81: '🌦️ Averses fortes', 82: '⛈️ Averses violentes',
+      95: '⛈️ Orage', 96: '⛈️ Orage avec grêle', 99: '⛈️ Orage violent'
+    };
+
+    async function chargerMeteo() {
+      const bloc = document.getElementById('bloc-meteo');
+      if (!bloc) return;
+      try {
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=48.04114&longitude=-1.423929&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Europe%2FParis&forecast_days=7';
+        const reponse = await fetch(url);
+        const data = await reponse.json();
+
+        const tempActuelle = Math.round(data.current.temperature_2m);
+        const codeActuel = data.current.weather_code;
+        const descActuelle = codesMeteo[codeActuel] || '';
+
+        const previsions = data.daily.time.slice(1, 6).map((date, i) => {
+          const jour = new Date(date).toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '');
+          const max = Math.round(data.daily.temperature_2m_max[i + 1]);
+          const min = Math.round(data.daily.temperature_2m_min[i + 1]);
+          const code = data.daily.weather_code[i + 1];
+          const emoji = (codesMeteo[code] || '').split(' ')[0];
+          return `<div class="previsions-jour"><span>${jour}</span><span>${emoji}</span><span>${max}°/${min}°</span></div>`;
+        }).join('');
+
+        bloc.innerHTML = `
+          <p class="bandeau-meteo-titre">Météo à Chaumeré</p>
+          <p class="bandeau-meteo-actuelle">${descActuelle} — ${tempActuelle}°C</p>
+          <div class="previsions-semaine">${previsions}</div>
+        `;
+      } catch (e) {
+        bloc.innerHTML = '<p class="bandeau-meteo-titre">Météo à Chaumeré</p><p class="bandeau-meteo-contenu">Indisponible pour le moment.</p>';
+      }
+    }
+    chargerMeteo();
+
+    // Prix des carburants a proximite (API officielle data.economie.gouv.fr)
+    async function chargerCarburants() {
+      const bloc = document.getElementById('bloc-carburants');
+      if (!bloc) return;
+      try {
+        const url = "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=distance(geom,%20geom%27POINT(-1.423929%2048.04114)%27,%2020km)&limit=40";
+        const reponse = await fetch(url);
+        const data = await reponse.json();
+
+        const stationsGazole = data.results
+          .filter(s => s.gazole_prix)
+          .sort((a, b) => a.gazole_prix - b.gazole_prix)
+          .slice(0, 4);
+
+        if (stationsGazole.length === 0) {
+          bloc.innerHTML = '<p class="bandeau-carburants-titre">Carburants</p><p class="bandeau-meteo-contenu">Aucune donnée disponible.</p>';
+          return;
+        }
+
+        const lignes = stationsGazole.map(s => `
+          <li>
+            <span class="carburant-ville">${s.ville}</span>
+            <span class="carburant-prix">${s.gazole_prix.toFixed(3)} €</span>
+          </li>
+        `).join('');
+
+        bloc.innerHTML = `
+          <p class="bandeau-carburants-titre">Gazole le moins cher (20km)</p>
+          <ul class="liste-carburants">${lignes}</ul>
+          <a href="/autour-de-rennes/carburants/" class="lien-plus">Voir tous les carburants →</a>
+        `;
+      } catch (e) {
+        bloc.innerHTML = '<p class="bandeau-carburants-titre">Carburants</p><p class="bandeau-meteo-contenu">Indisponible pour le moment.</p>';
+      }
+    }
+    chargerCarburants();
+
+    // Qualite de l'air et pollens (API Open-Meteo, gratuite, sans cle)
+    function categorieAQI(valeur) {
+      if (valeur <= 20) return { label: 'Bon', classe: 'aqi-bon' };
+      if (valeur <= 40) return { label: 'Moyen', classe: 'aqi-moyen' };
+      if (valeur <= 60) return { label: 'Dégradé', classe: 'aqi-degrade' };
+      if (valeur <= 80) return { label: 'Mauvais', classe: 'aqi-mauvais' };
+      return { label: 'Très mauvais', classe: 'aqi-tres-mauvais' };
+    }
+
+    async function chargerAir() {
+      const bloc = document.getElementById('bloc-air');
+      if (!bloc) return;
+      try {
+        const url = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=48.04114&longitude=-1.423929&current=european_aqi&hourly=birch_pollen,grass_pollen,alder_pollen,ragweed_pollen,mugwort_pollen,olive_pollen&timezone=Europe%2FParis&forecast_days=1';
+        const reponse = await fetch(url);
+        const data = await reponse.json();
+
+        const aqi = Math.round(data.current.european_aqi);
+        const cat = categorieAQI(aqi);
+
+        // On prend l'heure actuelle pour les pollens (index correspondant dans le tableau horaire)
+        const heureActuelle = new Date().getHours();
+        const pollens = [
+          { nom: 'Bouleau', valeur: data.hourly.birch_pollen[heureActuelle] },
+          { nom: 'Graminées', valeur: data.hourly.grass_pollen[heureActuelle] },
+          { nom: 'Aulne', valeur: data.hourly.alder_pollen[heureActuelle] },
+          { nom: 'Ambroisie', valeur: data.hourly.ragweed_pollen[heureActuelle] },
+          { nom: 'Armoise', valeur: data.hourly.mugwort_pollen[heureActuelle] },
+          { nom: 'Olivier', valeur: data.hourly.olive_pollen[heureActuelle] }
+        ].filter(p => p.valeur !== null && p.valeur > 5); // on n'affiche que les pollens significatifs
+
+        const pollensTexte = pollens.length > 0
+          ? pollens.map(p => p.nom).join(', ')
+          : 'Aucun pollen significatif';
+
+        bloc.innerHTML = `
+          <p class="bandeau-air-titre">Qualité de l'air</p>
+          <p class="bandeau-aqi ${cat.classe}">${cat.label} <span class="aqi-valeur">(indice ${aqi})</span></p>
+          <p class="bandeau-pollens">🌾 Pollens : ${pollensTexte}</p>
+          <a href="/autour-de-rennes/qualite-air/" class="lien-plus">Comparer en Bretagne →</a>
+        `;
+      } catch (e) {
+        bloc.innerHTML = '<p class="bandeau-air-titre">Qualité de l\'air</p><p class="bandeau-meteo-contenu">Indisponible pour le moment.</p>';
+      }
+    }
+    chargerAir();
+  </script>
 </body>
 </html>
