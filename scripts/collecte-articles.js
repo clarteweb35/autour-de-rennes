@@ -36,8 +36,7 @@ function normalizeDatatourisme(item) {
 }
 
 async function fetchDatatourisme() {
-  // Codes INSEE : Rennes 35238, Domagne 35113, Vitre 35360, Janze 35136, Chateaugiron 35069
-  const url = `https://api.datatourisme.fr/v1/entertainmentAndEvent?filters=isLocatedAt.address.hasAddressCity.insee[in]=35238,35113,35360,35136,35069&fields=uuid,label,takesPlaceAt,isLocatedAt,hasDescription,lastUpdate,hasContact&lang=fr&page_size=40`;
+  const url = `https://api.datatourisme.fr/v1/entertainmentAndEvent?filters=isLocatedAt.address.hasAddressCity.insee[in]=35238,35113,35360,35136,35069&fields=uuid,label,takesPlaceAt,isLocatedAt,hasDescription,lastUpdate,hasContact,type&lang=fr&page_size=40`;
   const response = await fetch(url, {
     headers: { 'X-API-Key': DATATOURISME_API_KEY }
   });
@@ -46,6 +45,14 @@ async function fetchDatatourisme() {
   console.log(`OK - ${data.objects.length} evenements recuperes depuis DATAtourisme`);
   return data.objects;
 }
+
+// Liste fixe de categories - l'IA doit choisir UNE seule valeur dans cette liste,
+// en se basant sur la description reelle de l'evenement (plus fiable que le champ
+// "type" DATAtourisme, souvent trop generique).
+const CATEGORIES_POSSIBLES = [
+  "Concert", "Festival", "Culture", "Exposition", "Atelier",
+  "Sport", "Marché", "Vide-Grenier", "Spectacle", "Conférence", "Autre"
+];
 
 const articleSchema = {
   type: "object",
@@ -56,9 +63,10 @@ const articleSchema = {
     meta_title: { type: "string" },
     meta_description: { type: "string" },
     keywords: { type: "array", items: { type: "string" } },
-    needs_human_review: { type: "boolean" }
+    needs_human_review: { type: "boolean" },
+    categorie: { type: "string", enum: CATEGORIES_POSSIBLES }
   },
-  required: ["status", "missing_fields", "article_markdown", "meta_title", "meta_description", "keywords", "needs_human_review"]
+  required: ["status", "missing_fields", "article_markdown", "meta_title", "meta_description", "keywords", "needs_human_review", "categorie"]
 };
 
 const SYSTEM_PROMPT = `Tu es un journaliste local specialise dans l'actualite et l'agenda culturel de la region rennaise (Rennes et son bassin de vie, Ille-et-Vilaine). Tu rediges des articles pour un site d'actualite locale destine aux habitants cherchant "quoi faire ce week-end" (brocantes, braderies, evenements culturels, marches, sorties familiales).
@@ -69,7 +77,9 @@ Ton dynamique, chaleureux, journalistique. Structure l'article en Markdown : tit
 
 Genere aussi : meta_title (60 caracteres max), meta_description (150-160 caracteres max), keywords (5-8 mots-cles incluant des variantes locales).
 
-Si les donnees sont insuffisantes (titre, date ou lieu manquant), reponds avec status "insufficient_data" et liste les champs manquants dans missing_fields, en laissant article_markdown vide.`;
+Classe egalement l'evenement dans UNE SEULE categorie parmi cette liste exacte : ${CATEGORIES_POSSIBLES.join(', ')}. Base ce choix sur le contenu reel de la description fournie (pas sur des suppositions). Utilise "Autre" uniquement si aucune categorie ne correspond clairement.
+
+Si les donnees sont insuffisantes (titre, date ou lieu manquant), reponds avec status "insufficient_data" et liste les champs manquants dans missing_fields, en laissant article_markdown vide (categorie peut rester "Autre" dans ce cas).`;
 
 async function genererArticle(eventData) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent`;
@@ -144,7 +154,7 @@ prix: null
 source_url: "https://www.datatourisme.fr/"
 needs_human_review: ${article.needs_human_review}
 publishedAt: "${new Date().toISOString()}"
-categorie: null
+categorie: "${article.categorie}"
 ---
 
 ${article.article_markdown}
@@ -153,7 +163,7 @@ ${article.article_markdown}
   const dossier = path.join('src', 'content', 'articles');
   const cheminFichier = path.join(dossier, `${slug}.md`);
   fs.writeFileSync(cheminFichier, frontmatter, { encoding: 'utf8' });
-  console.log(`  -> Fichier ecrit : ${slug}.md`);
+  console.log(`  -> Fichier ecrit : ${slug}.md (categorie: ${article.categorie})`);
 }
 
 function attendre(ms) {
