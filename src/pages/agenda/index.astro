@@ -18,6 +18,8 @@ const articlesTries = articlesAVenir.sort((a, b) =>
   new Date(a.data.date_debut).getTime() - new Date(b.data.date_debut).getTime()
 );
 
+const categoriesUniques = [...new Set(articlesTries.map(a => a.data.categorie).filter(Boolean))].sort();
+
 function formaterJourMois(dateStr: string) {
   const date = new Date(dateStr);
   return {
@@ -84,6 +86,7 @@ if (foodTrucksAujourdhui.length === 0) {
         <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
         <span class="sous-titre-site">L'agenda des sorties locales</span>
       </nav>
+      <a href="https://le-relais-de-chaumere.fr" target="_blank" rel="noopener" class="btn-gite">Mon gîte</a>
     </div>
   </header>
 
@@ -154,13 +157,22 @@ if (foodTrucksAujourdhui.length === 0) {
     <h1 class="titre-page">Que faire à Rennes<br />et alentours ?</h1>
     <p class="chapo-page">Braderies, brocantes, marchés et rendez-vous culturels du bassin rennais, mis à jour chaque jour.</p>
 
-    <div class="grille-evenements">
+    {categoriesUniques.length > 0 && (
+      <div class="filtres-categories" id="filtres-categories">
+        <button class="filtre-chip filtre-chip-actif" data-categorie="Tout">Tout</button>
+        {categoriesUniques.map(cat => (
+          <button class="filtre-chip" data-categorie={cat}>{cat}</button>
+        ))}
+      </div>
+    )}
+
+    <div class="grille-evenements" id="grille-evenements">
       {articlesTries.map(article => {
         const d = article.data;
         const longueDuree = estLongueDuree(d.date_debut, d.date_fin);
         const { jour, mois } = formaterJourMois(longueDuree ? d.date_fin : d.date_debut);
         return (
-          <article class="carte-evenement">
+          <article class="carte-evenement" data-categorie={d.categorie || ''}>
             <div class="billet-date">
               {longueDuree && <span class="billet-prefixe">Jusqu'au</span>}
               <span class="billet-jour">{jour}</span>
@@ -187,6 +199,26 @@ if (foodTrucksAujourdhui.length === 0) {
   </footer>
 
   <script>
+    // Filtres par categorie (interactif, cote client)
+    const boutonsFiltres = document.querySelectorAll('.filtre-chip');
+    const cartesEvenements = document.querySelectorAll('.carte-evenement');
+
+    boutonsFiltres.forEach(bouton => {
+      bouton.addEventListener('click', () => {
+        boutonsFiltres.forEach(b => b.classList.remove('filtre-chip-actif'));
+        bouton.classList.add('filtre-chip-actif');
+
+        const categorieChoisie = bouton.dataset.categorie;
+        cartesEvenements.forEach(carte => {
+          if (categorieChoisie === 'Tout' || carte.dataset.categorie === categorieChoisie) {
+            carte.style.display = '';
+          } else {
+            carte.style.display = 'none';
+          }
+        });
+      });
+    });
+
     function majHorloge() {
       const el = document.getElementById('horloge');
       if (!el) return;
