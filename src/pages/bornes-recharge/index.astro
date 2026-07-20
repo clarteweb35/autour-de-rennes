@@ -28,19 +28,32 @@ import { bornesRecharge } from '../../data/bornes-recharge.js';
     <a href="/autour-de-rennes/agenda/" class="fil-retour">← Retour à l'agenda</a>
     <h1 class="titre-page">Bornes de recharge électrique</h1>
     <p class="chapo-page">Toutes les bornes recensées autour de Domagné, triées par distance.</p>
+    <p class="note-precision"><strong>AC</strong> = charge normale (recharge en quelques heures, connecteur Type 2). <strong>DC</strong> = charge rapide (recharge en 20-40 minutes, connecteur CCS Combo 2, tarif plus élevé).</p>
 
-    <div class="section-annuaire">
-      {bornesRecharge.map(b => (
-        <div class="ligne-commerce ligne-commerce-empilee">
-          <div class="ligne-commerce-principal">
-            <span class="ligne-commerce-nom">{b.nom}</span>
-            <span class="ligne-commerce-commune">{b.commune} · {b.distance}</span>
-          </div>
-          <p class="ligne-commerce-note">📍 {b.adresse} · 🔌 {b.connecteurs} · ⚡ {b.puissance}</p>
-          <p class="ligne-commerce-note">💶 {b.tarif} · 💳 {b.carte}</p>
-        </div>
-      ))}
-    </div>
+    <table class="table-carburants">
+      <thead>
+        <tr>
+          <th>Commune</th>
+          <th>Distance</th>
+          <th>Opérateur</th>
+          <th>Connecteurs</th>
+          <th>Puissance</th>
+          <th>Tarif indicatif</th>
+        </tr>
+      </thead>
+      <tbody>
+        {bornesRecharge.map(b => (
+          <tr>
+            <td>{b.commune}<br /><span class="station-adresse">{b.adresse}</span></td>
+            <td>{b.distance}</td>
+            <td>{b.nom}<br /><span class="station-adresse">{b.carte}</span></td>
+            <td>{b.connecteurs}</td>
+            <td>{b.puissance}</td>
+            <td>{b.tarif}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
 
     <p class="note-precision">Tarifs et disponibilités indicatifs, susceptibles d'évoluer selon les opérateurs — vérifiez sur l'application dédiée avant de vous déplacer.</p>
   </main>
