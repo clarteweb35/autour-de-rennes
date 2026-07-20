@@ -71,7 +71,7 @@ if (foodTrucksAujourdhui.length === 0) {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Que faire à Rennes ce week-end ? Agenda local</title>
-  <meta name="description" content="Braderies, brocantes, événements culturels : découvrez l'agenda complet des sorties à Rennes et alentours." />
+  <meta name="description" content="Braderies, brocantes, événements culturels : l'agenda de Domagné, Châteaubourg, Vitré, Janzé, Châteaugiron et Rennes." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -84,7 +84,7 @@ if (foodTrucksAujourdhui.length === 0) {
       <nav class="nav-entete">
         <a href="/autour-de-rennes/annuaire/">Annuaire</a>
         <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
-        <span class="sous-titre-site">L'agenda des sorties locales</span>
+        <span class="sous-titre-site">Domagné · Châteaubourg · Vitré · Janzé · Châteaugiron</span>
       </nav>
       <a href="https://le-relais-de-chaumere.fr" target="_blank" rel="noopener" class="btn-gite">Mon gîte</a>
     </div>
@@ -146,7 +146,7 @@ if (foodTrucksAujourdhui.length === 0) {
     </div>
 
     <h1 class="titre-page">Que faire à Rennes<br />et alentours ?</h1>
-    <p class="chapo-page">Braderies, brocantes, marchés et rendez-vous culturels du bassin rennais, mis à jour chaque jour.</p>
+    <p class="chapo-page">Braderies, brocantes, marchés et rendez-vous culturels de Domagné, Châteaubourg, Vitré, Janzé, Châteaugiron et du bassin rennais, mis à jour chaque jour.</p>
 
     {categoriesUniques.length > 0 && (
       <div class="filtres-categories" id="filtres-categories">
@@ -285,7 +285,10 @@ if (foodTrucksAujourdhui.length === 0) {
         bloc.innerHTML = `
           <p class="carte-info-titre">Gazole le moins cher</p>
           <ul class="liste-courte">${lignes}</ul>
-          <a href="/autour-de-rennes/carburants/" class="lien-plus">Voir tous les carburants →</a>
+          <div class="liens-carte">
+            <a href="/autour-de-rennes/carburants/" class="lien-carte">Voir tous les carburants →</a>
+            <a href="/autour-de-rennes/bornes-recharge/" class="lien-carte">Bornes de recharge électrique →</a>
+          </div>
         `;
       } catch (e) {
         bloc.innerHTML = '<p class="carte-info-titre">Carburants</p><p class="carte-info-contenu">Indisponible pour le moment.</p>';
