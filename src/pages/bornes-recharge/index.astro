@@ -1,1 +1,52 @@
+---
+import { bornesRecharge } from '../../data/bornes-recharge.js';
+---
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bornes de recharge électrique près de Domagné | Autour de Rennes</title>
+  <meta name="description" content="Trouvez une borne de recharge pour véhicule électrique près de Domagné, Châteaubourg, Châteaugiron et Servon-sur-Vilaine." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-contenu">
+      <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
+      <nav class="nav-entete">
+        <a href="/autour-de-rennes/annuaire/">Annuaire</a>
+        <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
+        <span class="sous-titre-site">L'agenda des sorties locales</span>
+      </nav>
+    </div>
+  </header>
 
+  <main class="conteneur">
+    <a href="/autour-de-rennes/agenda/" class="fil-retour">← Retour à l'agenda</a>
+    <h1 class="titre-page">Bornes de recharge électrique</h1>
+    <p class="chapo-page">Toutes les bornes recensées autour de Domagné, triées par distance.</p>
+
+    <div class="section-annuaire">
+      {bornesRecharge.map(b => (
+        <div class="ligne-commerce ligne-commerce-empilee">
+          <div class="ligne-commerce-principal">
+            <span class="ligne-commerce-nom">{b.nom}</span>
+            <span class="ligne-commerce-commune">{b.commune} · {b.distance}</span>
+          </div>
+          <p class="ligne-commerce-note">📍 {b.adresse} · 🔌 {b.connecteurs} · ⚡ {b.puissance}</p>
+          <p class="ligne-commerce-note">💶 {b.tarif} · 💳 {b.carte}</p>
+        </div>
+      ))}
+    </div>
+
+    <p class="note-precision">Tarifs et disponibilités indicatifs, susceptibles d'évoluer selon les opérateurs — vérifiez sur l'application dédiée avant de vous déplacer.</p>
+  </main>
+
+  <footer class="pied-site">
+    <p>Autour de Rennes — données bornes de recharge mises à jour manuellement.</p>
+  </footer>
+</body>
+</html>
