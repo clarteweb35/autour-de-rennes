@@ -284,6 +284,24 @@ body {
   text-decoration: underline;
 }
 
+.liens-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.6rem;
+}
+
+.lien-carte {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--marque);
+  text-decoration: none;
+}
+
+.lien-carte:hover {
+  text-decoration: underline;
+}
+
 .aqi-bon { color: var(--marque); }
 .aqi-moyen { color: var(--accent); }
 .aqi-degrade { color: #ea580c; }
