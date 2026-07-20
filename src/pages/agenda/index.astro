@@ -20,6 +20,25 @@ const articlesTries = articlesAVenir.sort((a, b) =>
 
 const categoriesUniques = [...new Set(articlesTries.map(a => a.data.categorie).filter(Boolean))].sort();
 
+const visuelsCategorie = {
+  "Concert": { emoji: "🎸", c1: "#c7d2fe", c2: "#a5b4fc" },
+  "Festival": { emoji: "🎉", c1: "#e9d5ff", c2: "#d8b4fe" },
+  "Culture": { emoji: "🏛️", c1: "#bfdbfe", c2: "#93c5fd" },
+  "Exposition": { emoji: "🖼️", c1: "#99f6e4", c2: "#5eead4" },
+  "Atelier": { emoji: "🏺", c1: "#fbcfe8", c2: "#f9a8d4" },
+  "Sport": { emoji: "⚽", c1: "#bbf7d0", c2: "#86efac" },
+  "Marché": { emoji: "🥕", c1: "#fed7aa", c2: "#fdba74" },
+  "Vide-Grenier": { emoji: "🧺", c1: "#fde68a", c2: "#fcd34d" },
+  "Spectacle": { emoji: "🎭", c1: "#fecdd3", c2: "#fda4af" },
+  "Conférence": { emoji: "🎤", c1: "#e2e8f0", c2: "#cbd5e1" },
+  "Autre": { emoji: "✨", c1: "#e5e7eb", c2: "#d1d5db" },
+};
+function visuelPour(categorie) {
+  return visuelsCategorie[categorie] || visuelsCategorie["Autre"];
+}
+
+const evenementsALaUne = articlesTries.slice(0, 3);
+
 function formaterJourMois(dateStr: string) {
   const date = new Date(dateStr);
   return {
@@ -70,7 +89,7 @@ if (foodTrucksAujourdhui.length === 0) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Que faire à Rennes ce week-end ? Agenda local</title>
+  <title>Que faire aujourd'hui ? Agenda local</title>
   <meta name="description" content="Braderies, brocantes, événements culturels : l'agenda de Domagné, Châteaubourg, Vitré, Janzé, Châteaugiron et Rennes." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -84,6 +103,7 @@ if (foodTrucksAujourdhui.length === 0) {
       <nav class="nav-entete">
         <a href="/autour-de-rennes/annuaire/">Annuaire</a>
         <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
+        <a href="/autour-de-rennes/a-propos/">À propos</a>
         <span class="sous-titre-site">Domagné · Châteaubourg · Vitré · Janzé · Châteaugiron</span>
       </nav>
       <a href="https://le-relais-de-chaumere.fr" target="_blank" rel="noopener" class="btn-gite">Mon gîte</a>
@@ -104,49 +124,87 @@ if (foodTrucksAujourdhui.length === 0) {
 
     <!-- Grille de 4 cartes resumees -->
     <div class="grille-infos">
-      <div class="carte-info" id="bloc-meteo">
-        <p class="carte-info-titre">Météo à Chaumeré</p>
-        <p class="carte-info-contenu">Chargement…</p>
+      <div class="carte-info">
+        <img class="carte-info-vignette" src="/autour-de-rennes/images/chalet-jardin.jpg" alt="Le Relais de Chaumeré" />
+        <div class="carte-info-corps" id="bloc-meteo">
+          <p class="carte-info-titre">Météo à Chaumeré</p>
+          <p class="carte-info-contenu">Chargement…</p>
+        </div>
       </div>
 
       <div class="carte-info">
-        <p class="carte-info-titre">Marché{marchesAujourdhui.length > 1 ? 's' : ''} aujourd'hui</p>
-        {marchesAujourdhui.length > 0 ? (
-          <ul class="liste-courte">
-            {marchesAujourdhui.slice(0, 2).map(m => (
-              <li>{m.commune} <span class="liste-courte-detail">— {m.horaire}</span></li>
-            ))}
-          </ul>
-        ) : (
-          <p class="carte-info-contenu">Aucun marché aujourd'hui.</p>
-        )}
-        <a href="/autour-de-rennes/marches/" class="lien-plus">Tous les marchés →</a>
+        <img class="carte-info-vignette" src="/autour-de-rennes/images/marche.jpg" alt="Marché" />
+        <div class="carte-info-corps">
+          <p class="carte-info-titre">Marché{marchesAujourdhui.length > 1 ? 's' : ''} aujourd'hui</p>
+          {marchesAujourdhui.length > 0 ? (
+            <ul class="liste-courte">
+              {marchesAujourdhui.slice(0, 2).map(m => (
+                <li>{m.commune} <span class="liste-courte-detail">— {m.horaire}</span></li>
+              ))}
+            </ul>
+          ) : (
+            <p class="carte-info-contenu">Aucun marché aujourd'hui.</p>
+          )}
+          <a href="/autour-de-rennes/marches/" class="lien-plus">Tous les marchés →</a>
+        </div>
       </div>
 
       <div class="carte-info">
-        <p class="carte-info-titre">Food trucks aujourd'hui</p>
-        {foodTrucksAujourdhui.length > 0 ? (
-          <ul class="liste-courte">
-            {foodTrucksAujourdhui.slice(0, 2).map(f => (
-              <li>{f.nom} <span class="liste-courte-detail">— {f.specialite}</span></li>
-            ))}
-          </ul>
-        ) : prochainsFoodTrucks.length > 0 ? (
-          <p class="carte-info-contenu">Rien aujourd'hui. Prochain : <strong>{prochainJourLabel}</strong></p>
-        ) : (
-          <p class="carte-info-contenu">Aucun food truck recensé.</p>
-        )}
-        <a href="/autour-de-rennes/foodtrucks/" class="lien-plus">Tous les food trucks →</a>
+        <img class="carte-info-vignette" src="/autour-de-rennes/images/foodtruck.jpg" alt="Food truck" />
+        <div class="carte-info-corps">
+          <p class="carte-info-titre">Food trucks aujourd'hui</p>
+          {foodTrucksAujourdhui.length > 0 ? (
+            <ul class="liste-courte">
+              {foodTrucksAujourdhui.slice(0, 2).map(f => (
+                <li>{f.nom} <span class="liste-courte-detail">— {f.specialite}</span></li>
+              ))}
+            </ul>
+          ) : prochainsFoodTrucks.length > 0 ? (
+            <p class="carte-info-contenu">Rien aujourd'hui. Prochain : <strong>{prochainJourLabel}</strong></p>
+          ) : (
+            <p class="carte-info-contenu">Aucun food truck recensé.</p>
+          )}
+          <a href="/autour-de-rennes/foodtrucks/" class="lien-plus">Tous les food trucks →</a>
+        </div>
       </div>
 
-      <div class="carte-info" id="bloc-carburants">
-        <p class="carte-info-titre">Carburants à proximité</p>
-        <p class="carte-info-contenu">Chargement…</p>
+      <div class="carte-info">
+        <img class="carte-info-vignette" src="/autour-de-rennes/images/carburants.jpg" alt="Carburants" />
+        <div class="carte-info-corps" id="bloc-carburants">
+          <p class="carte-info-titre">Carburants à proximité</p>
+          <p class="carte-info-contenu">Chargement…</p>
+        </div>
       </div>
     </div>
 
-    <h1 class="titre-page">Que faire à Rennes<br />et alentours ?</h1>
-    <p class="chapo-page">Braderies, brocantes, marchés et rendez-vous culturels de Domagné, Châteaubourg, Vitré, Janzé, Châteaugiron et du bassin rennais, mis à jour chaque jour.</p>
+    <div class="section-que-faire">
+      <div class="que-faire-texte">
+        <h1 class="titre-page">Que faire aujourd'hui ?</h1>
+        <p class="chapo-page">Braderies, brocantes, marchés et rendez-vous culturels de Domagné, Châteaubourg, Vitré, Janzé, Châteaugiron et du bassin rennais, mis à jour chaque jour.</p>
+      </div>
+      <img class="que-faire-image" src="/autour-de-rennes/images/quoi-faire.jpg" alt="Autour de Domagné" />
+    </div>
+
+    {evenementsALaUne.length > 0 && (
+      <div class="grille-alaune">
+        {evenementsALaUne.map(article => {
+          const d = article.data;
+          const visuel = visuelPour(d.categorie);
+          const dateAffichee = new Date(d.date_debut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+          return (
+            <a href={`/autour-de-rennes/agenda/${d.slug}`} class="carte-alaune">
+              <div class="carte-alaune-image" style={`background: linear-gradient(135deg, ${visuel.c1}, ${visuel.c2});`}>
+                {visuel.emoji}
+              </div>
+              <div class="carte-alaune-corps">
+                <p class="carte-alaune-date">{dateAffichee}</p>
+                <p class="carte-alaune-titre">{d.title}</p>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
 
     {categoriesUniques.length > 0 && (
       <div class="filtres-categories" id="filtres-categories">
@@ -187,6 +245,7 @@ if (foodTrucksAujourdhui.length === 0) {
 
   <footer class="pied-site">
     <p>Autour de Rennes — agenda mis à jour automatiquement à partir de sources officielles.</p>
+    <p>Site créé et édité par <a href="https://www.clarte-web.fr" target="_blank" rel="noopener" class="lien-credit">clarte-web.fr</a></p>
   </footer>
 
   <script>
