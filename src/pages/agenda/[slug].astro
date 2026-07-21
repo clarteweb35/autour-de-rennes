@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
+import { visuelPour } from '../../data/visuels-categories.js';
 
 export async function getStaticPaths() {
   const articles = await getCollection('articles', ({ data }) => !data.needs_human_review);
@@ -12,6 +13,7 @@ export async function getStaticPaths() {
 const { article } = Astro.props;
 const { Content } = await render(article);
 const d = article.data;
+const visuel = visuelPour(d.categorie);
 
 const eventSchema = {
   "@context": "https://schema.org",
@@ -53,7 +55,7 @@ const eventSchema = {
   <meta name="description" content={d.meta_description} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
   <script type="application/ld+json" set:html={JSON.stringify(eventSchema)} />
 </head>
@@ -61,12 +63,24 @@ const eventSchema = {
   <header class="entete">
     <div class="entete-contenu">
       <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
-      <span class="sous-titre-site">L'agenda des sorties locales</span>
+      <nav class="nav-entete">
+        <a href="/autour-de-rennes/annuaire/">Annuaire</a>
+        <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
+        <span class="sous-titre-site">Domagné · Châteaubourg · Vitré · Janzé · Châteaugiron</span>
+      </nav>
+      <a href="https://le-relais-de-chaumere.fr" target="_blank" rel="noopener" class="btn-gite">Mon gîte</a>
     </div>
   </header>
 
   <main class="conteneur">
     <a href="/autour-de-rennes/agenda/" class="fil-retour">← Tous les événements</a>
+
+    {d.categorie && (
+      <span class="badge-categorie" style={`background: linear-gradient(135deg, ${visuel.c1}, ${visuel.c2});`}>
+        {visuel.emoji} {d.categorie}
+      </span>
+    )}
+
     <h1 class="article-titre">{d.title}</h1>
 
     <div class="article-corps">
@@ -78,6 +92,12 @@ const eventSchema = {
 
   <footer class="pied-site">
     <p>Autour de Rennes — agenda mis à jour automatiquement à partir de sources officielles.</p>
+    <nav class="pied-nav">
+      <a href="/autour-de-rennes/a-propos/">À propos</a>
+      <a href="/autour-de-rennes/sitemap.html">Plan du site</a>
+      <a href="/autour-de-rennes/mentions-legales/">Mentions légales</a>
+    </nav>
+    <p>Site créé et édité par <a href="https://www.clarte-web.fr" target="_blank" rel="noopener" class="lien-credit">clarte-web.fr</a></p>
   </footer>
 </body>
 </html>
