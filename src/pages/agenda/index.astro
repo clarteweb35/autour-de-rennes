@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { marches } from '../../data/marches.js';
 import { saints } from '../../data/saints.js';
 import { foodTrucks } from '../../data/foodtrucks.js';
+import { visuelPour } from '../../data/visuels-categories.js';
 
 const articles = await getCollection('articles', ({ data }) => !data.needs_human_review);
 
@@ -20,23 +21,6 @@ const articlesTries = articlesAVenir.sort((a, b) =>
 
 const categoriesUniques = [...new Set(articlesTries.map(a => a.data.categorie).filter(Boolean))].sort();
 
-const visuelsCategorie = {
-  "Concert": { emoji: "🎸", c1: "#c7d2fe", c2: "#a5b4fc" },
-  "Festival": { emoji: "🎉", c1: "#e9d5ff", c2: "#d8b4fe" },
-  "Culture": { emoji: "🏛️", c1: "#bfdbfe", c2: "#93c5fd" },
-  "Exposition": { emoji: "🖼️", c1: "#99f6e4", c2: "#5eead4" },
-  "Atelier": { emoji: "🏺", c1: "#fbcfe8", c2: "#f9a8d4" },
-  "Sport": { emoji: "⚽", c1: "#bbf7d0", c2: "#86efac" },
-  "Marché": { emoji: "🥕", c1: "#fed7aa", c2: "#fdba74" },
-  "Vide-Grenier": { emoji: "🧺", c1: "#fde68a", c2: "#fcd34d" },
-  "Spectacle": { emoji: "🎭", c1: "#fecdd3", c2: "#fda4af" },
-  "Conférence": { emoji: "🎤", c1: "#e2e8f0", c2: "#cbd5e1" },
-  "Autre": { emoji: "✨", c1: "#e5e7eb", c2: "#d1d5db" },
-};
-function visuelPour(categorie) {
-  return visuelsCategorie[categorie] || visuelsCategorie["Autre"];
-}
-
 const evenementsALaUne = articlesTries.slice(0, 3);
 
 function formaterJourMois(dateStr: string) {
@@ -47,9 +31,12 @@ function formaterJourMois(dateStr: string) {
   };
 }
 
-function estLongueDuree(dateDebut: string, dateFin: string) {
-  const diffJours = (new Date(dateFin).getTime() - new Date(dateDebut).getTime()) / (1000 * 60 * 60 * 24);
-  return diffJours > 3;
+function estEnCours(dateDebut: string, dateFin: string) {
+  const aujourdhui = new Date();
+  aujourdhui.setHours(0, 0, 0, 0);
+  const debut = new Date(dateDebut);
+  const fin = new Date(dateFin);
+  return debut < aujourdhui && fin >= aujourdhui;
 }
 
 const maintenant = new Date();
@@ -103,7 +90,6 @@ if (foodTrucksAujourdhui.length === 0) {
       <nav class="nav-entete">
         <a href="/autour-de-rennes/annuaire/">Annuaire</a>
         <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
-        <a href="/autour-de-rennes/a-propos/">À propos</a>
         <span class="sous-titre-site">Domagné · Châteaubourg · Vitré · Janzé · Châteaugiron</span>
       </nav>
       <a href="https://le-relais-de-chaumere.fr" target="_blank" rel="noopener" class="btn-gite">Mon gîte</a>
@@ -210,7 +196,7 @@ if (foodTrucksAujourdhui.length === 0) {
       <div class="filtres-categories" id="filtres-categories">
         <button class="filtre-chip filtre-chip-actif" data-categorie="Tout">Tout</button>
         {categoriesUniques.map(cat => (
-          <button class="filtre-chip" data-categorie={cat}>{cat}</button>
+          <button class="filtre-chip" data-categorie={cat}>{visuelPour(cat).emoji} {cat}</button>
         ))}
       </div>
     )}
@@ -218,12 +204,14 @@ if (foodTrucksAujourdhui.length === 0) {
     <div class="grille-evenements" id="grille-evenements">
       {articlesTries.map(article => {
         const d = article.data;
-        const longueDuree = estLongueDuree(d.date_debut, d.date_fin);
-        const { jour, mois } = formaterJourMois(longueDuree ? d.date_fin : d.date_debut);
+        const enCours = estEnCours(d.date_debut, d.date_fin);
+        const { jour, mois } = formaterJourMois(enCours ? d.date_fin : d.date_debut);
+        const visuel = visuelPour(d.categorie);
         return (
-          <article class="carte-evenement" data-categorie={d.categorie || ''}>
-            <div class="billet-date">
-              {longueDuree && <span class="billet-prefixe">Jusqu'au</span>}
+          <article class="carte-evenement" data-categorie={d.categorie || ''} style={`--couleur-carte: ${visuel.c2};`}>
+            <div class="billet-date" style={`background: linear-gradient(135deg, ${visuel.c1}, ${visuel.c2});`}>
+              <span class="billet-emoji">{visuel.emoji}</span>
+              {enCours && <span class="billet-prefixe">Jusqu'au</span>}
               <span class="billet-jour">{jour}</span>
               <span class="billet-mois">{mois}</span>
             </div>
@@ -232,7 +220,7 @@ if (foodTrucksAujourdhui.length === 0) {
             </h2>
             <p class="carte-meta">📍 {d.lieu}, {d.ville}</p>
             <div class="carte-tags">
-              {d.categorie && <span class="etiquette">{d.categorie}</span>}
+              {d.categorie && <span class="etiquette">{visuelPour(d.categorie).emoji} {d.categorie}</span>}
               {d.prix && <span class="etiquette prix">{d.prix}</span>}
             </div>
           </article>
@@ -245,6 +233,11 @@ if (foodTrucksAujourdhui.length === 0) {
 
   <footer class="pied-site">
     <p>Autour de Rennes — agenda mis à jour automatiquement à partir de sources officielles.</p>
+    <nav class="pied-nav">
+      <a href="/autour-de-rennes/a-propos/">À propos</a>
+      <a href="/autour-de-rennes/sitemap.html">Plan du site</a>
+      <a href="/autour-de-rennes/mentions-legales/">Mentions légales</a>
+    </nav>
     <p>Site créé et édité par <a href="https://www.clarte-web.fr" target="_blank" rel="noopener" class="lien-credit">clarte-web.fr</a></p>
   </footer>
 
