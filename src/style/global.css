@@ -1,0 +1,740 @@
+/* ===== Design tokens ===== */
+:root {
+  --ardoise: #25333B;
+  --craie: #F6F1E7;
+  --moutarde: #C6862A;
+  --rouille: #A8462E;
+  --lande: #586F5C;
+  --ligne: #D8D0BF;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--craie);
+  color: var(--ardoise);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+/* ===== En-tete du site ===== */
+.entete {
+  border-bottom: 3px solid var(--ardoise);
+  padding: 1.5rem 1.5rem 1.25rem;
+  background: var(--craie);
+}
+
+.entete-contenu {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.logo-site {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.6rem;
+  color: var(--ardoise);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.logo-site em {
+  font-style: italic;
+  color: var(--rouille);
+}
+
+.sous-titre-site {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--lande);
+}
+
+.nav-entete {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+}
+
+.nav-entete > a {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ardoise);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-entete > a:hover {
+  border-bottom-color: var(--moutarde);
+}
+
+/* ===== Conteneur general ===== */
+.conteneur {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.titre-page {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  line-height: 1.05;
+  margin: 0 0 0.5rem;
+  color: var(--ardoise);
+}
+
+/* ===== Bandeau du jour (date/heure/saint, meteo, marches) ===== */
+.bandeau-jour {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1px;
+  background: var(--ardoise);
+  border: 1px solid var(--ardoise);
+  margin-bottom: 2.5rem;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.bandeau-bloc {
+  background: #fff;
+  padding: 1.1rem 1.25rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+  position: relative;
+  min-height: 140px;
+}
+
+.bandeau-jour-texte {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--lande);
+  margin: 0 0 0.3rem;
+}
+
+.bandeau-heure {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.8rem;
+  color: var(--ardoise);
+  margin: 0 0 0.3rem;
+}
+
+.bandeau-saint {
+  font-size: 0.85rem;
+  color: var(--rouille);
+  margin: 0;
+}
+
+.bandeau-meteo-titre,
+.bandeau-marches-titre {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--lande);
+  margin: 0 0 0.5rem;
+}
+
+.bandeau-meteo-actuelle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.6rem;
+}
+
+.bandeau-meteo-contenu {
+  font-size: 0.9rem;
+  color: var(--lande);
+}
+
+.previsions-semaine {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.previsions-jour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.7rem;
+  color: var(--lande);
+  text-transform: capitalize;
+}
+
+.liste-marches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.88rem;
+  width: 100%;
+}
+
+.liste-marches li {
+  padding: 0.15rem 0;
+}
+
+.marche-horaire {
+  color: var(--lande);
+  font-size: 0.8rem;
+}
+
+.bandeau-marches-vide {
+  font-size: 0.88rem;
+  color: var(--lande);
+  margin: 0;
+}
+
+.bandeau-marches-note {
+  font-size: 0.75rem;
+  color: var(--lande);
+  margin: 0.5rem 0 0;
+  font-style: italic;
+}
+
+.bandeau-marches-prochain {
+  font-size: 0.85rem;
+  color: var(--rouille);
+  margin: 0 0 0.4rem;
+}
+
+.bandeau-carburants-titre {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--lande);
+  margin: 0 0 0.5rem;
+}
+
+.liste-carburants {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.liste-carburants li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+}
+
+.carburant-ville {
+  color: var(--ardoise);
+}
+
+.carburant-prix {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--rouille);
+}
+
+.bandeau-air-titre {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--lande);
+  margin: 0 0 0.5rem;
+}
+
+.bandeau-aqi {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.aqi-valeur {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--lande);
+}
+
+.aqi-bon { color: var(--lande); }
+.aqi-moyen { color: var(--moutarde); }
+.aqi-degrade { color: #B8720C; }
+.aqi-mauvais { color: var(--rouille); }
+.aqi-tres-mauvais { color: #7A2E1C; }
+
+.bandeau-pollens {
+  font-size: 0.85rem;
+  color: var(--ardoise);
+  margin: 0;
+}
+
+.lien-plus {
+  position: absolute;
+  bottom: 0.8rem;
+  right: 1rem;
+  margin-top: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lande);
+  text-decoration: none;
+}
+
+.lien-plus:hover {
+  color: var(--rouille);
+}
+
+/* ===== Page carburants detaillee ===== */
+.table-carburants {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.table-carburants th {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--lande);
+  text-align: left;
+  padding: 0.6rem 0.7rem;
+  border-bottom: 2px solid var(--ardoise);
+}
+
+.table-carburants td {
+  padding: 0.6rem 0.7rem;
+  border-bottom: 1px dashed var(--ligne);
+}
+
+.station-adresse {
+  font-size: 0.78rem;
+  color: var(--lande);
+}
+
+/* ===== Page qualite de l'air ===== */
+.note-precision {
+  font-size: 0.82rem;
+  color: var(--lande);
+  border-left: 3px solid var(--ligne);
+  padding-left: 0.8rem;
+  margin: -1rem 0 2rem;
+  max-width: 60ch;
+}
+
+.sous-titre-section {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin: 2rem 0 0.75rem;
+}
+
+.liste-air {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ligne-air {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px dashed var(--ligne);
+}
+
+.ligne-air-phare {
+  background: #fff;
+  border: 1px solid var(--ardoise);
+  border-radius: 2px;
+  padding: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.air-ville {
+  font-weight: 600;
+}
+
+.air-badge {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 100px;
+  border: 1px solid currentColor;
+}
+
+/* ===== Page annuaire ===== */
+.section-annuaire {
+  margin-bottom: 2.5rem;
+}
+
+.grille-annuaire {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.carte-commerce {
+  background: #fff;
+  border: 1px solid var(--ligne);
+  border-radius: 2px;
+  padding: 1rem 1.1rem;
+}
+
+.commerce-nom {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0 0 0.15rem;
+}
+
+.commerce-sous-categorie {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--moutarde);
+  margin: 0 0 0.6rem;
+}
+
+.commerce-detail {
+  font-size: 0.88rem;
+  margin: 0.2rem 0;
+  color: var(--ardoise);
+}
+
+.commerce-detail a {
+  color: var(--rouille);
+  text-decoration: none;
+}
+
+.commerce-web {
+  font-size: 0.78rem;
+  color: var(--lande);
+  margin: 0.4rem 0 0;
+}
+
+.badge-ouvert,
+.badge-ferme,
+.badge-inconnu {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.55rem;
+  border-radius: 100px;
+  margin: 0.3rem 0 0.5rem;
+}
+
+.badge-ouvert {
+  background: #E4EEE0;
+  color: var(--lande);
+}
+
+.badge-ferme {
+  background: #F3E2DC;
+  color: var(--rouille);
+}
+
+.badge-inconnu {
+  background: #EFEAE0;
+  color: #8A8272;
+}
+
+.btn-toggle {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--ardoise);
+  color: var(--craie);
+  border: none;
+  padding: 0.55rem 1.1rem;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-bottom: 2rem;
+}
+
+.btn-toggle:hover {
+  background: var(--rouille);
+}
+
+.sous-titre-section-majeur {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin: 2.5rem 0 1rem;
+  border-top: 2px solid var(--ardoise);
+  padding-top: 1.5rem;
+}
+
+.encart-urgence {
+  background: var(--ardoise);
+  color: var(--craie);
+  padding: 1.5rem;
+  border-radius: 2px;
+  margin: 1.5rem 0 2.5rem;
+}
+
+.encart-urgence-numero {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2rem;
+  margin: 0 0 0.5rem;
+}
+
+.encart-urgence-texte {
+  font-size: 0.92rem;
+  margin: 0;
+  max-width: 60ch;
+  opacity: 0.9;
+}
+
+.encart-urgence-texte strong {
+  color: var(--moutarde);
+}
+
+@media (max-width: 720px) {
+  .bandeau-jour { grid-template-columns: 1fr; }
+}
+
+.chapo-page {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--lande);
+  max-width: 42ch;
+  margin: 0 0 2.5rem;
+}
+
+/* ===== Grille de cartes evenements ===== */
+.grille-evenements {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.75rem;
+}
+
+.carte-evenement {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--ligne);
+  border-radius: 2px;
+  padding: 1.5rem 1.25rem 1.25rem;
+  box-shadow: 3px 3px 0 var(--ligne);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.carte-evenement:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--moutarde);
+}
+
+/* Le "ticket" de date, signature visuelle du site */
+.billet-date {
+  position: absolute;
+  top: -14px;
+  left: 20px;
+  transform: rotate(-3deg);
+  background: var(--rouille);
+  color: var(--craie);
+  font-family: var(--font-mono);
+  text-align: center;
+  padding: 0.35rem 0.6rem 0.3rem;
+  border-radius: 2px;
+  box-shadow: 2px 2px 0 rgba(37, 51, 59, 0.25);
+}
+
+.billet-jour {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.billet-prefixe {
+  display: block;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+.billet-mois {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.1rem;
+}
+
+.carte-titre {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 1rem 0 0.6rem;
+}
+
+.carte-titre a {
+  color: var(--ardoise);
+  text-decoration: none;
+  background-image: linear-gradient(var(--moutarde), var(--moutarde));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size 0.2s ease;
+}
+
+.carte-titre a:hover {
+  background-size: 100% 2px;
+}
+
+.carte-meta {
+  font-size: 0.9rem;
+  color: var(--lande);
+  margin: 0.2rem 0;
+}
+
+.carte-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.etiquette {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--lande);
+  color: var(--lande);
+  border-radius: 100px;
+}
+
+.etiquette.prix {
+  border-color: var(--moutarde);
+  color: var(--moutarde);
+}
+
+/* ===== Page article ===== */
+.fil-retour {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--lande);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+}
+
+.fil-retour:hover { color: var(--rouille); }
+
+.article-titre {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
+  line-height: 1.08;
+  margin: 0 0 1.5rem;
+}
+
+.article-corps {
+  font-size: 1.08rem;
+  max-width: 68ch;
+}
+
+.article-corps h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin-top: 2rem;
+  color: var(--ardoise);
+}
+
+.article-corps h3 {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rouille);
+  margin-top: 2rem;
+}
+
+/* Fiche pratique en tableau */
+.article-corps table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.25rem 0 2rem;
+  font-size: 0.95rem;
+}
+
+.article-corps th,
+.article-corps td {
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px dashed var(--ligne);
+}
+
+.article-corps th {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--lande);
+  width: 30%;
+}
+
+.article-source {
+  font-size: 0.85rem;
+  color: var(--lande);
+  border-top: 1px dashed var(--ligne);
+  padding-top: 1rem;
+  margin-top: 2rem;
+}
+
+.article-source a { color: var(--rouille); }
+
+/* ===== Pied de page ===== */
+.pied-site {
+  border-top: 3px solid var(--ardoise);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--lande);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .conteneur { padding: 1.75rem 1.25rem 3rem; }
+  .grille-evenements { grid-template-columns: 1fr; }
+}
+
+/* ===== Accessibilite ===== */
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--rouille);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carte-evenement { transition: none; }
+}

@@ -8,14 +8,19 @@
   <meta name="description" content="Comparez les prix de tous les carburants (Gazole, SP95, SP98, E10) dans les stations autour de Domagné et Rennes." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
 </head>
 <body>
   <header class="entete">
     <div class="entete-contenu">
       <a href="/autour-de-rennes/agenda/" class="logo-site">Autour de <em>Rennes</em></a>
-      <span class="sous-titre-site">L'agenda des sorties locales</span>
+      <nav class="nav-entete">
+        <a href="/autour-de-rennes/annuaire/">Annuaire</a>
+        <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
+        <span class="sous-titre-site">Domagné · Châteaubourg · Vitré · Janzé · Châteaugiron</span>
+      </nav>
+      <a href="https://le-relais-de-chaumere.fr" target="_blank" rel="noopener" class="btn-gite">Mon gîte</a>
     </div>
   </header>
 
@@ -31,6 +36,12 @@
 
   <footer class="pied-site">
     <p>Autour de Rennes — données carburants issues de l'API officielle du Ministère de l'Économie.</p>
+    <nav class="pied-nav">
+      <a href="/autour-de-rennes/a-propos/">À propos</a>
+      <a href="/autour-de-rennes/sitemap.html">Plan du site</a>
+      <a href="/autour-de-rennes/mentions-legales/">Mentions légales</a>
+    </nav>
+    <p>Site créé et édité par <a href="https://www.clarte-web.fr" target="_blank" rel="noopener" class="lien-credit">clarte-web.fr</a></p>
   </footer>
 
   <script>
@@ -40,6 +51,16 @@
       const dLon = (lon2 - lon1) * Math.PI / 180;
       const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function derniereMaj(s) {
+      const dates = [s.gazole_maj, s.sp95_maj, s.sp98_maj, s.e10_maj].filter(Boolean).map(d => new Date(d));
+      if (dates.length === 0) return null;
+      const plusRecente = new Date(Math.max(...dates));
+      const maintenant = new Date();
+      const diffJours = Math.floor((maintenant - plusRecente) / (1000 * 60 * 60 * 24));
+      const dateAffichee = plusRecente.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      return { dateAffichee, diffJours };
     }
 
     async function chargerStations() {
@@ -69,10 +90,18 @@
                 <th>SP95</th>
                 <th>SP98</th>
                 <th>E10</th>
+                <th>Dernière MAJ</th>
               </tr>
             </thead>
             <tbody>
-              ${stations.map(s => `
+              ${stations.map(s => {
+                const maj = derniereMaj(s);
+                let cellMaj = '<span class="station-adresse">Inconnue</span>';
+                if (maj) {
+                  const couleur = maj.diffJours > 7 ? 'color: #dc2626; font-weight: 600;' : maj.diffJours > 2 ? 'color: #ea580c;' : 'color: #047857;';
+                  cellMaj = `<span style="${couleur}">${maj.dateAffichee}${maj.diffJours > 0 ? ' (il y a ' + maj.diffJours + 'j)' : ' (aujourd\\'hui)'}</span>`;
+                }
+                return `
                 <tr>
                   <td>${s.ville}<br /><span class="station-adresse">${s.adresse || ''}</span></td>
                   <td>${s.distance.toFixed(1)} km</td>
@@ -80,8 +109,10 @@
                   <td>${s.sp95_prix ? s.sp95_prix.toFixed(3) + ' €' : '—'}</td>
                   <td>${s.sp98_prix ? s.sp98_prix.toFixed(3) + ' €' : '—'}</td>
                   <td>${s.e10_prix ? s.e10_prix.toFixed(3) + ' €' : '—'}</td>
+                  <td>${cellMaj}</td>
                 </tr>
-              `).join('')}
+              `;
+              }).join('')}
             </tbody>
           </table>
         `;

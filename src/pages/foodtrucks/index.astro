@@ -13,7 +13,7 @@ const foodTrucksVariables = foodTrucks.filter(f => f.jour === 'variable');
   <meta name="description" content="Retrouvez tous les food trucks de la semaine autour de Domagné, Châteaubourg, Châteaugiron et Domloup." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/autour-de-rennes/styles/global.css" />
 </head>
 <body>
@@ -23,8 +23,9 @@ const foodTrucksVariables = foodTrucks.filter(f => f.jour === 'variable');
       <nav class="nav-entete">
         <a href="/autour-de-rennes/annuaire/">Annuaire</a>
         <a href="/autour-de-rennes/pharmacies-garde/">Pharmacie de garde</a>
-        <span class="sous-titre-site">L'agenda des sorties locales</span>
+        <span class="sous-titre-site">Domagné · Châteaubourg · Vitré · Janzé · Châteaugiron</span>
       </nav>
+      <a href="https://le-relais-de-chaumere.fr" target="_blank" rel="noopener" class="btn-gite">Mon gîte</a>
     </div>
   </header>
 
@@ -41,14 +42,12 @@ const foodTrucksVariables = foodTrucks.filter(f => f.jour === 'variable');
           <h2 class="sous-titre-section">{jour.charAt(0).toUpperCase() + jour.slice(1)}</h2>
           <div class="liste-commerces">
             {trucksDuJour.map(f => (
-              <div class="ligne-commerce">
+              <div class="ligne-commerce ligne-commerce-empilee">
                 <div class="ligne-commerce-principal">
                   <span class="ligne-commerce-nom">{f.nom}</span>
                   <span class="ligne-commerce-commune">{f.commune} — {f.moment}</span>
                 </div>
-                <div class="ligne-commerce-secondaire">
-                  <span class="ligne-commerce-tel">📍 {f.lieu}</span>
-                </div>
+                <p class="ligne-commerce-note">🍽️ {f.specialite} · 📍 {f.lieu}</p>
               </div>
             ))}
           </div>
@@ -61,14 +60,12 @@ const foodTrucksVariables = foodTrucks.filter(f => f.jour === 'variable');
         <h2 class="sous-titre-section">Jours variables</h2>
         <div class="liste-commerces">
           {foodTrucksVariables.map(f => (
-            <div class="ligne-commerce">
+            <div class="ligne-commerce ligne-commerce-empilee">
               <div class="ligne-commerce-principal">
                 <span class="ligne-commerce-nom">{f.nom}</span>
                 <span class="ligne-commerce-commune">{f.commune} — {f.moment}</span>
               </div>
-              <div class="ligne-commerce-secondaire">
-                <span class="ligne-commerce-tel">📍 {f.lieu}</span>
-              </div>
+              <p class="ligne-commerce-note">🍽️ {f.specialite} · 📍 {f.lieu}</p>
             </div>
           ))}
         </div>
@@ -78,6 +75,12 @@ const foodTrucksVariables = foodTrucks.filter(f => f.jour === 'variable');
 
   <footer class="pied-site">
     <p>Autour de Rennes — planning food trucks mis à jour manuellement.</p>
+    <nav class="pied-nav">
+      <a href="/autour-de-rennes/a-propos/">À propos</a>
+      <a href="/autour-de-rennes/sitemap.html">Plan du site</a>
+      <a href="/autour-de-rennes/mentions-legales/">Mentions légales</a>
+    </nav>
+    <p>Site créé et édité par <a href="https://www.clarte-web.fr" target="_blank" rel="noopener" class="lien-credit">clarte-web.fr</a></p>
   </footer>
 </body>
 </html>
