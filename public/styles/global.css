@@ -485,17 +485,34 @@ body {
 
 .billet-emoji {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  font-size: 0.9rem;
+  top: -6px;
+  right: -6px;
+  font-size: 0.6rem;
   background: #fff;
   border-radius: 50%;
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1rem;
+  height: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+}
+
+/* Evenement long (plusieurs jours) : badge plus large, icone bien plus grande */
+.billet-date-long {
+  width: auto;
+  min-width: 4.5rem;
+  padding: 0.35rem 0.6rem;
+}
+
+.billet-date-long .billet-emoji {
+  position: static;
+  font-size: 1.6rem;
+  background: transparent;
+  box-shadow: none;
+  width: auto;
+  height: auto;
+  margin-bottom: 0.1rem;
 }
 
 .billet-jour {
@@ -718,6 +735,19 @@ body {
   padding: 0.7rem 0.8rem;
   border-bottom: 1px solid var(--ligne);
 }
+
+.etiquette-tarif {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.tarif-economique { background: var(--marque-clair); color: var(--marque); }
+.tarif-modere { background: var(--accent-clair); color: var(--accent); }
+.tarif-eleve { background: #fee2e2; color: #dc2626; }
+.tarif-variable { background: #e2e8f0; color: var(--texte-mute); }
 
 .station-adresse {
   font-size: 0.78rem;
