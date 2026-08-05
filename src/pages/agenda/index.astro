@@ -21,7 +21,16 @@ const articlesTries = articlesAVenir.sort((a, b) =>
 
 const categoriesUniques = [...new Set(articlesTries.map(a => a.data.categorie).filter(Boolean))].sort();
 
-const evenementsALaUne = articlesTries.slice(0, 3);
+function melanger(tableau) {
+  const copie = [...tableau];
+  for (let i = copie.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copie[i], copie[j]] = [copie[j], copie[i]];
+  }
+  return copie;
+}
+
+const evenementsALaUne = melanger(articlesTries).slice(0, 3);
 
 function formaterJourMois(dateStr: string) {
   const date = new Date(dateStr);
@@ -204,16 +213,25 @@ if (foodTrucksAujourdhui.length === 0) {
     <div class="grille-evenements" id="grille-evenements">
       {articlesTries.map(article => {
         const d = article.data;
+        const estLong = d.date_debut !== d.date_fin;
         const enCours = estEnCours(d.date_debut, d.date_fin);
-        const { jour, mois } = formaterJourMois(enCours ? d.date_fin : d.date_debut);
+        const { jour: jourDebut } = formaterJourMois(d.date_debut);
+        const { jour: jourFin, mois: moisFin } = formaterJourMois(d.date_fin);
         const visuel = visuelPour(d.categorie);
         return (
           <article class="carte-evenement" data-categorie={d.categorie || ''} style={`--couleur-carte: ${visuel.c2};`}>
-            <div class="billet-date" style={`background: linear-gradient(135deg, ${visuel.c1}, ${visuel.c2});`}>
-              <span class="billet-emoji">{visuel.emoji}</span>
-              {enCours && <span class="billet-prefixe">Jusqu'au</span>}
-              <span class="billet-jour">{jour}</span>
-              <span class="billet-mois">{mois}</span>
+            <div class={`billet-date ${estLong ? 'billet-date-long' : ''}`} style={`background: linear-gradient(135deg, ${visuel.c1}, ${visuel.c2});`}>
+              <span class="billet-emoji-fond">{visuel.emoji}</span>
+              <span class="billet-badge-date">
+                {estLong ? (
+                  <>
+                    <span class="billet-badge-prefixe">{enCours ? "Jusqu'au" : `Du ${jourDebut} au`}</span>
+                    <span class="billet-badge-jourmois">{jourFin} {moisFin}</span>
+                  </>
+                ) : (
+                  <span class="billet-badge-jourmois">{jourDebut} {moisFin}</span>
+                )}
+              </span>
             </div>
             <h2 class="carte-titre">
               <a href={`/autour-de-rennes/agenda/${d.slug}`}>{d.title}</a>
