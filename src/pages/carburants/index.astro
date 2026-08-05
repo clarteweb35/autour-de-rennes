@@ -98,8 +98,9 @@
                 const maj = derniereMaj(s);
                 let cellMaj = '<span class="station-adresse">Inconnue</span>';
                 if (maj) {
-                  const couleur = maj.diffJours > 7 ? 'color: #dc2626; font-weight: 600;' : maj.diffJours > 2 ? 'color: #ea580c;' : 'color: #047857;';
-                  cellMaj = `<span style="${couleur}">${maj.dateAffichee}${maj.diffJours > 0 ? ' (il y a ' + maj.diffJours + 'j)' : ' (aujourd\\'hui)'}</span>`;
+                  const couleurFeu = maj.diffJours > 4 ? '#dc2626' : maj.diffJours >= 2 ? '#ea580c' : '#047857';
+                  const pastille = `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${couleurFeu};margin-right:6px;"></span>`;
+                  cellMaj = `<span style="display:inline-flex;align-items:center;">${pastille}${maj.dateAffichee}${maj.diffJours > 0 ? ' (il y a ' + maj.diffJours + 'j)' : " (aujourd'hui)"}</span>`;
                 }
                 return `
                 <tr>
