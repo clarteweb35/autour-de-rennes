@@ -470,70 +470,57 @@ body {
 }
 
 .billet-date {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 3.5rem;
-  height: 3.5rem;
-  background: var(--texte);
-  color: var(--texte);
-  border-radius: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.billet-emoji {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  font-size: 0.6rem;
-  background: #fff;
-  border-radius: 50%;
-  width: 1rem;
-  height: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 0.85rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.6rem;
+  overflow: visible;
 }
 
-/* Evenement long (plusieurs jours) : badge plus large, icone bien plus grande */
-.billet-date-long {
-  width: auto;
-  min-width: 4.5rem;
-  padding: 0.35rem 0.6rem;
-}
-
-.billet-date-long .billet-emoji {
-  position: static;
-  font-size: 1.6rem;
-  background: transparent;
-  box-shadow: none;
-  width: auto;
-  height: auto;
-  margin-bottom: 0.1rem;
-}
-
-.billet-jour {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.2rem;
+.billet-emoji-fond {
+  font-size: 2.1rem;
   line-height: 1;
 }
 
-.billet-mois {
-  font-size: 0.62rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  opacity: 0.75;
+.billet-badge-date {
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--texte);
+  color: #fff;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.2);
 }
 
-.billet-prefixe {
+/* Evenement long (plusieurs jours) : badge un peu plus large pour le prefixe */
+.billet-date-long .billet-badge-date {
+  padding: 0.25rem 0.6rem;
+}
+
+.billet-badge-jourmois {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.billet-badge-prefixe {
   font-size: 0.5rem;
   text-transform: uppercase;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .carte-titre {
