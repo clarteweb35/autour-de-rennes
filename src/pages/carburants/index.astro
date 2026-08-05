@@ -27,7 +27,23 @@
   <main class="conteneur">
     <a href="/autour-de-rennes/agenda/" class="fil-retour">← Retour à l'agenda</a>
     <h1 class="titre-page">Carburants à proximité</h1>
-    <p class="chapo-page">Toutes les stations dans un rayon de 20 km autour de Domagné, triées par distance, avec le détail de chaque carburant.</p>
+    <p class="chapo-page">Toutes les stations dans un rayon de 20 km autour de Domagné, avec le détail de chaque carburant.</p>
+
+    <div class="controles-tri">
+      <label for="tri-critere">Trier par :</label>
+      <select id="tri-critere">
+        <option value="distance">Distance</option>
+        <option value="prix">Prix</option>
+        <option value="pertinence">Pertinence (données récentes)</option>
+      </select>
+      <label for="tri-carburant">Carburant :</label>
+      <select id="tri-carburant">
+        <option value="gazole">Gazole</option>
+        <option value="sp95">SP95</option>
+        <option value="sp98">SP98</option>
+        <option value="e10">E10</option>
+      </select>
+    </div>
 
     <div id="liste-stations">
       <p>Chargement des données…</p>
@@ -43,6 +59,26 @@
     </nav>
     <p>Site créé et édité par <a href="https://www.clarte-web.fr" target="_blank" rel="noopener" class="lien-credit">clarte-web.fr</a></p>
   </footer>
+
+  <style>
+    .controles-tri {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 16px 0;
+    }
+    .controles-tri label {
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+    .controles-tri select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 0.9em;
+    }
+  </style>
 
   <script>
     function distanceKm(lat1, lon1, lat2, lon2) {
@@ -63,6 +99,87 @@
       return { dateAffichee, diffJours };
     }
 
+    let stationsChargees = [];
+
+    function trierEtAfficher() {
+      const critere = document.getElementById('tri-critere').value;
+      const carburant = document.getElementById('tri-carburant').value;
+      const cleprix = carburant + '_prix';
+      const clemaj = carburant + '_maj';
+
+      let stations = [...stationsChargees];
+
+      if (critere === 'distance') {
+        stations.sort((a, b) => a.distance - b.distance);
+      } else if (critere === 'prix') {
+        stations.sort((a, b) => {
+          const pa = a[cleprix], pb = b[cleprix];
+          if (pa == null && pb == null) return 0;
+          if (pa == null) return 1;
+          if (pb == null) return -1;
+          return pa - pb;
+        });
+      } else if (critere === 'pertinence') {
+        stations.sort((a, b) => {
+          const maja = a[clemaj] ? new Date(a[clemaj]) : null;
+          const majb = b[clemaj] ? new Date(b[clemaj]) : null;
+          if (!maja && !majb) return 0;
+          if (!maja) return 1;
+          if (!majb) return -1;
+          return majb - maja;
+        });
+      }
+
+      afficherTableau(stations);
+    }
+
+    function afficherTableau(stations) {
+      const conteneur = document.getElementById('liste-stations');
+
+      if (stations.length === 0) {
+        conteneur.innerHTML = '<p>Aucune donnée disponible pour le moment.</p>';
+        return;
+      }
+
+      conteneur.innerHTML = `
+        <table class="table-carburants">
+          <thead>
+            <tr>
+              <th>Station</th>
+              <th>Distance</th>
+              <th>Gazole</th>
+              <th>SP95</th>
+              <th>SP98</th>
+              <th>E10</th>
+              <th>Dernière MAJ</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${stations.map(s => {
+              const maj = derniereMaj(s);
+              let cellMaj = '<span class="station-adresse">Inconnue</span>';
+              if (maj) {
+                const couleurFeu = maj.diffJours > 4 ? '#dc2626' : maj.diffJours >= 2 ? '#ea580c' : '#047857';
+                const pastille = `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${couleurFeu};margin-right:6px;"></span>`;
+                cellMaj = `<span style="display:inline-flex;align-items:center;">${pastille}${maj.dateAffichee}${maj.diffJours > 0 ? ' (il y a ' + maj.diffJours + 'j)' : " (aujourd'hui)"}</span>`;
+              }
+              return `
+              <tr>
+                <td>${s.ville}<br /><span class="station-adresse">${s.adresse || ''}</span></td>
+                <td>${s.distance.toFixed(1)} km</td>
+                <td>${s.gazole_prix ? s.gazole_prix.toFixed(3) + ' €' : '—'}</td>
+                <td>${s.sp95_prix ? s.sp95_prix.toFixed(3) + ' €' : '—'}</td>
+                <td>${s.sp98_prix ? s.sp98_prix.toFixed(3) + ' €' : '—'}</td>
+                <td>${s.e10_prix ? s.e10_prix.toFixed(3) + ' €' : '—'}</td>
+                <td>${cellMaj}</td>
+              </tr>
+            `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
     async function chargerStations() {
       const conteneur = document.getElementById('liste-stations');
       try {
@@ -70,57 +187,18 @@
         const reponse = await fetch(url);
         const data = await reponse.json();
 
-        const stations = data.results
+        stationsChargees = data.results
           .filter(s => s.geom && (s.gazole_prix || s.sp95_prix || s.sp98_prix || s.e10_prix))
-          .map(s => ({ ...s, distance: distanceKm(48.04114, -1.423929, s.geom.lat, s.geom.lon) }))
-          .sort((a, b) => a.distance - b.distance);
+          .map(s => ({ ...s, distance: distanceKm(48.04114, -1.423929, s.geom.lat, s.geom.lon) }));
 
-        if (stations.length === 0) {
-          conteneur.innerHTML = '<p>Aucune donnée disponible pour le moment.</p>';
-          return;
-        }
-
-        conteneur.innerHTML = `
-          <table class="table-carburants">
-            <thead>
-              <tr>
-                <th>Station</th>
-                <th>Distance</th>
-                <th>Gazole</th>
-                <th>SP95</th>
-                <th>SP98</th>
-                <th>E10</th>
-                <th>Dernière MAJ</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${stations.map(s => {
-                const maj = derniereMaj(s);
-                let cellMaj = '<span class="station-adresse">Inconnue</span>';
-                if (maj) {
-                  const couleurFeu = maj.diffJours > 4 ? '#dc2626' : maj.diffJours >= 2 ? '#ea580c' : '#047857';
-                  const pastille = `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${couleurFeu};margin-right:6px;"></span>`;
-                  cellMaj = `<span style="display:inline-flex;align-items:center;">${pastille}${maj.dateAffichee}${maj.diffJours > 0 ? ' (il y a ' + maj.diffJours + 'j)' : " (aujourd'hui)"}</span>`;
-                }
-                return `
-                <tr>
-                  <td>${s.ville}<br /><span class="station-adresse">${s.adresse || ''}</span></td>
-                  <td>${s.distance.toFixed(1)} km</td>
-                  <td>${s.gazole_prix ? s.gazole_prix.toFixed(3) + ' €' : '—'}</td>
-                  <td>${s.sp95_prix ? s.sp95_prix.toFixed(3) + ' €' : '—'}</td>
-                  <td>${s.sp98_prix ? s.sp98_prix.toFixed(3) + ' €' : '—'}</td>
-                  <td>${s.e10_prix ? s.e10_prix.toFixed(3) + ' €' : '—'}</td>
-                  <td>${cellMaj}</td>
-                </tr>
-              `;
-              }).join('')}
-            </tbody>
-          </table>
-        `;
+        trierEtAfficher();
       } catch (e) {
         conteneur.innerHTML = '<p>Impossible de charger les données pour le moment.</p>';
       }
     }
+
+    document.getElementById('tri-critere').addEventListener('change', trierEtAfficher);
+    document.getElementById('tri-carburant').addEventListener('change', trierEtAfficher);
     chargerStations();
   </script>
 </body>
